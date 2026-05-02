@@ -1041,6 +1041,10 @@ export default function App() {
               <div className="nlbl">{n.label}</div>
             </div>
           ))}
+          <div className="ni" onClick={handleLogout} style={{opacity:.7}}>
+            <div className="nico">🚪</div>
+            <div className="nlbl">Logout</div>
+          </div>
         </div>
 
         {/* BOOKING / STRIPE MODAL */}
