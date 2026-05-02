@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://svklnqtitmmbrdgilrbh.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2a2xucXRpdG1tYnJkZ2lscmJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NTA0NzAsImV4cCI6MjA5MzMyNjQ3MH0.gWEcaW5JC5TlZmVX8KGVHEp7QWl1HZc4JjQN39QaPJA";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const G = "#F5C518";
 const GD = "#c9a010";
@@ -447,14 +452,57 @@ export default function App() {
   const [hasCourse, setHasCourse] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [vidCat, setVidCat] = useState("all");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser({ name: session.user.email, role: "athlete" });
+        setScreen("app");
+      }
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setUser({ name: session.user.email, role: "athlete" });
+        setScreen("app");
+      } else {
+        setUser(null);
+        setScreen("auth");
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleLogin(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    setAuthError("");
+    setAuthLoading(true);
+    try {
+      if (authMode === "login") {
+        const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
+        if (error) setAuthError(error.message);
+      } else {
+        const { error } = await supabase.auth.signUp({ email: authEmail, password: authPassword });
+        if (error) setAuthError(error.message);
+        else setAuthError("Check your email to confirm your account then sign in.");
+      }
+    } catch (err) {
+      setAuthError("Something went wrong. Please try again.");
+    }
+    setAuthLoading(false);
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    setScreen("auth");
+    setUser(null);
+    setTab("home");
+  }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
-
-  function handleLogin(e) {
-    e.preventDefault();
-    setUser({ name: role === "coach" ? "Coach Stefan" : "Athlete", role });
-    setScreen(role === "coach" ? "coach" : "app");
-  }
 
   function toggleDrill(id) {
     setCompleted(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -510,13 +558,22 @@ export default function App() {
               )}
               <div className="auth-field">
                 <label className="auth-label">Email</label>
-                <input className="auth-input" type="email" placeholder="you@example.com" />
+                <input className="auth-input" type="email" placeholder="you@example.com"
+                  value={authEmail} onChange={e => setAuthEmail(e.target.value)} />
               </div>
               <div className="auth-field">
                 <label className="auth-label">Password</label>
-                <input className="auth-input" type="password" placeholder="••••••••" />
+                <input className="auth-input" type="password" placeholder="••••••••"
+                  value={authPassword} onChange={e => setAuthPassword(e.target.value)} />
               </div>
-              <button type="submit" className="auth-btn" onClick={handleLogin}>{authMode === "login" ? "Sign In →" : "Create Account →"}</button>
+              {authError && (
+                <div style={{fontSize:12, color: authError.includes("Check your email") ? "#22c55e" : "#ee5566",
+                  marginBottom:10, padding:"8px 12px", background:"rgba(255,255,255,.05)",
+                  borderRadius:4, lineHeight:1.5}}>{authError}</div>
+              )}
+              <button type="submit" className="auth-btn" onClick={handleLogin} disabled={authLoading}>
+                {authLoading ? "Please wait..." : authMode === "login" ? "Sign In →" : "Create Account →"}
+              </button>
             </form>
             <div className="auth-switch" onClick={() => setAuthMode(m => m === "login" ? "signup" : "login")}>
               {authMode === "login" ? <>New here? <span>Create a free account</span></> : <>Already have an account? <span>Sign in</span></>}
@@ -598,7 +655,7 @@ export default function App() {
               { icon: "🚪", label: "Sign Out", sub: "Log out of dashboard" },
             ].map((a, i) => (
               <div key={i} className="bk-row" style={{ cursor: "pointer" }}
-                onClick={() => a.label === "Sign Out" ? (setScreen("auth"), setUser(null)) : showToast(`${a.icon} ${a.label} — coming soon`)}>
+                onClick={() => a.label === "Sign Out" ? handleLogout() : showToast(`${a.icon} ${a.label} — coming soon`)}>
                 <div style={{ fontSize: 20, width: 32, textAlign: "center" }}>{a.icon}</div>
                 <div style={{ flex: 1 }}><div className="bk-ath" style={{ fontSize: 13 }}>{a.label}</div><div className="bk-info">{a.sub}</div></div>
                 <div style={{ color: GRAY, fontSize: 14 }}>›</div>
