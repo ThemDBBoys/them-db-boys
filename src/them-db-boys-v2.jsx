@@ -465,12 +465,14 @@ export default function App() {
     if (hash.includes("type=recovery")) {
       setResetMode(true);
       setScreen("auth");
-      // Exchange the token from URL
       const params = new URLSearchParams(hash.replace("#", "?"));
       const tokenHash = params.get("token_hash");
       if (tokenHash) {
-        supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" }).then(({ error }) => {
-          if (error) setAuthError("Reset link expired. Please request a new one.");
+        supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" }).then(({ data, error }) => {
+          if (error) {
+            setAuthError("Reset link expired. Please request a new one.");
+          }
+          // session is now established — password update will work
         });
       }
       return;
@@ -486,7 +488,7 @@ export default function App() {
       if (event === "PASSWORD_RECOVERY") {
         setResetMode(true);
         setScreen("auth");
-      } else if (event === "SIGNED_IN" && !resetMode) {
+      } else if (event === "SIGNED_IN" && !window.location.hash.includes("type=recovery")) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
         setResetMode(false);
