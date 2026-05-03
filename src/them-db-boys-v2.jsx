@@ -567,13 +567,31 @@ export default function App() {
                   value={authPassword} onChange={e => setAuthPassword(e.target.value)} />
               </div>
               {authError && (
-                <div style={{fontSize:12, color: authError.includes("Check your email") ? "#22c55e" : "#ee5566",
+                <div style={{fontSize:12, color: authError.includes("Check your email") || authError.includes("reset") ? "#22c55e" : "#ee5566",
                   marginBottom:10, padding:"8px 12px", background:"rgba(255,255,255,.05)",
                   borderRadius:4, lineHeight:1.5}}>{authError}</div>
               )}
               <button type="submit" className="auth-btn" onClick={handleLogin} disabled={authLoading}>
                 {authLoading ? "Please wait..." : authMode === "login" ? "Sign In →" : "Create Account →"}
               </button>
+              {authMode === "login" && (
+                <div style={{textAlign:"center", marginTop:12}}>
+                  <span
+                    style={{fontSize:12, color:G, cursor:"pointer", textDecoration:"underline"}}
+                    onClick={async () => {
+                      if (!authEmail) { setAuthError("Enter your email above first then click Forgot Password."); return; }
+                      setAuthLoading(true);
+                      const { error } = await supabase.auth.resetPasswordForEmail(authEmail, {
+                        redirectTo: "https://them-db-boys.vercel.app"
+                      });
+                      setAuthLoading(false);
+                      if (error) setAuthError(error.message);
+                      else setAuthError("Password reset email sent! Check your inbox.");
+                    }}>
+                    Forgot your password?
+                  </span>
+                </div>
+              )}
             </form>
             <div className="auth-switch" onClick={() => setAuthMode(m => m === "login" ? "signup" : "login")}>
               {authMode === "login" ? <>New here? <span>Create a free account</span></> : <>Already have an account? <span>Sign in</span></>}
