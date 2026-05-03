@@ -456,28 +456,12 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpEmail, setOtpEmail] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [newPassword, setNewPassword] = useState("");
-  const [resetMode, setResetMode] = useState(false);
 
   useEffect(() => {
-    // Check URL for recovery token immediately on load
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
-      setResetMode(true);
-      setScreen("auth");
-      const params = new URLSearchParams(hash.replace("#", "?"));
-      const tokenHash = params.get("token_hash");
-      if (tokenHash) {
-        supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" }).then(({ data, error }) => {
-          if (error) {
-            setAuthError("Reset link expired. Please request a new one.");
-          }
-          // session is now established — password update will work
-        });
-      }
-      return;
-    }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUser({ name: session.user.email, role: "athlete" });
@@ -485,13 +469,9 @@ export default function App() {
       }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setResetMode(true);
-        setScreen("auth");
-      } else if (event === "SIGNED_IN" && !window.location.hash.includes("type=recovery")) {
+      if (event === "SIGNED_IN" && session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
-        setResetMode(false);
       } else if (!session) {
         setUser(null);
         setScreen("auth");
@@ -565,56 +545,64 @@ export default function App() {
             "Your son has the talent. We give him the training, the roadmap, and the reason to stay locked in."
           </div>
 
-          {/* RESET PASSWORD SCREEN */}
-          {resetMode ? (
+          {/* OTP CODE ENTRY SCREEN */}
+          {otpSent ? (
             <div className="auth-card">
-              <div className="auth-title">Set New Password</div>
-              <div style={{fontSize:13, color:MID, marginBottom:16, lineHeight:1.5}}>Enter your new password below and click Save.</div>
+              <div className="auth-title">Check Your Email</div>
+              <div style={{fontSize:13, color:MID, marginBottom:16, lineHeight:1.6}}>
+                We sent a 6-digit code to <strong style={{color:"#fff"}}>{otpEmail}</strong>. Enter it below along with your new password.
+              </div>
+              <div className="auth-field">
+                <label className="auth-label">6-Digit Code</label>
+                <input className="auth-input" type="text" placeholder="123456" maxLength={6}
+                  value={otpCode} onChange={e => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                  style={{letterSpacing:"0.3em", fontSize:20, textAlign:"center"}} />
+              </div>
               <div className="auth-field">
                 <label className="auth-label">New Password</label>
                 <input className="auth-input" type="password" placeholder="Enter new password"
                   value={newPassword} onChange={e => setNewPassword(e.target.value)} />
               </div>
               {authError && (
-                <div style={{fontSize:12, color: authError.includes("updated") ? "#22c55e" : "#ee5566",
+                <div style={{fontSize:12, color: authError.includes("✅") ? "#22c55e" : "#ee5566",
                   marginBottom:10, padding:"8px 12px", background:"rgba(255,255,255,.05)", borderRadius:4, lineHeight:1.5}}>{authError}</div>
               )}
               <button className="auth-btn" disabled={authLoading} onClick={async () => {
+                if (!otpCode || otpCode.length < 6) { setAuthError("Enter the 6-digit code from your email."); return; }
                 if (!newPassword || newPassword.length < 6) { setAuthError("Password must be at least 6 characters."); return; }
                 setAuthLoading(true);
                 setAuthError("");
-                // Get current session first
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                  // Try to get session from URL token one more time
-                  const hash = window.location.hash;
-                  const params = new URLSearchParams(hash.replace("#", "?"));
-                  const tokenHash = params.get("token_hash");
-                  if (tokenHash) {
-                    const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
-                    if (otpError) { setAuthError("Reset link expired. Please request a new one."); setAuthLoading(false); return; }
-                  } else {
-                    setAuthError("Reset link expired. Please request a new one."); setAuthLoading(false); return;
-                  }
-                }
-                const { error } = await supabase.auth.updateUser({ password: newPassword });
+                const { error: verifyError } = await supabase.auth.verifyOtp({
+                  email: otpEmail,
+                  token: otpCode,
+                  type: "magiclink"
+                });
+                if (verifyError) { setAuthError(verifyError.message); setAuthLoading(false); return; }
+                const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
                 setAuthLoading(false);
-                if (error) setAuthError(error.message);
+                if (updateError) setAuthError(updateError.message);
                 else {
                   setAuthError("✅ Password updated! Signing you in...");
+                  setOtpSent(false);
+                  setOtpCode("");
+                  setNewPassword("");
                   setTimeout(async () => {
-                    setResetMode(false);
-                    window.location.hash = "";
                     const { data: { session } } = await supabase.auth.getSession();
                     if (session) {
                       setUser({ name: session.user.email, role: "athlete" });
                       setScreen("app");
                     }
-                  }, 2000);
+                  }, 1500);
                 }
               }}>
-                {authLoading ? "Saving..." : "Save New Password →"}
+                {authLoading ? "Verifying..." : "Verify Code & Save Password →"}
               </button>
+              <div style={{textAlign:"center", marginTop:12}}>
+                <span style={{fontSize:12, color:MID, cursor:"pointer"}}
+                  onClick={() => { setOtpSent(false); setOtpCode(""); setAuthError(""); }}>
+                  ← Back to Sign In
+                </span>
+              </div>
             </div>
 
           ) : (
@@ -659,12 +647,18 @@ export default function App() {
                     onClick={async () => {
                       if (!authEmail) { setAuthError("Enter your email above first then click Forgot Password."); return; }
                       setAuthLoading(true);
-                      const { error } = await supabase.auth.resetPasswordForEmail(authEmail, {
-                        redirectTo: "https://them-db-boys.vercel.app"
+                      setAuthError("");
+                      const { error } = await supabase.auth.signInWithOtp({
+                        email: authEmail,
+                        options: { shouldCreateUser: false }
                       });
                       setAuthLoading(false);
                       if (error) setAuthError(error.message);
-                      else setAuthError("Password reset email sent! Check your inbox.");
+                      else {
+                        setOtpEmail(authEmail);
+                        setOtpSent(true);
+                        setAuthError("✅ Check your email for a 6-digit code.");
+                      }
                     }}>
                     Forgot your password?
                   </span>
@@ -675,7 +669,7 @@ export default function App() {
               {authMode === "login" ? <>New here? <span>Create a free account</span></> : <>Already have an account? <span>Sign in</span></>}
             </div>
           </div>
-          )} {/* end resetMode conditional */}
+          )} {/* end !otpSent conditional */}
         </div>
       </div>
     </>
