@@ -456,19 +456,41 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetMode, setResetMode] = useState(false);
 
   useEffect(() => {
+    // Check URL for recovery token immediately on load
+    const hash = window.location.hash;
+    if (hash.includes("type=recovery")) {
+      setResetMode(true);
+      setScreen("auth");
+      // Exchange the token from URL
+      const params = new URLSearchParams(hash.replace("#", "?"));
+      const tokenHash = params.get("token_hash");
+      if (tokenHash) {
+        supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" }).then(({ error }) => {
+          if (error) setAuthError("Reset link expired. Please request a new one.");
+        });
+      }
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
       }
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setResetMode(true);
+        setScreen("auth");
+      } else if (event === "SIGNED_IN" && !resetMode) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
-      } else {
+        setResetMode(false);
+      } else if (!session) {
         setUser(null);
         setScreen("auth");
       }
@@ -540,6 +562,34 @@ export default function App() {
           <div className="auth-hook">
             "Your son has the talent. We give him the training, the roadmap, and the reason to stay locked in."
           </div>
+
+          {/* RESET PASSWORD SCREEN */}
+          {resetMode ? (
+            <div className="auth-card">
+              <div className="auth-title">Set New Password</div>
+              <div style={{fontSize:13, color:MID, marginBottom:16, lineHeight:1.5}}>Enter your new password below and click Save.</div>
+              <div className="auth-field">
+                <label className="auth-label">New Password</label>
+                <input className="auth-input" type="password" placeholder="Enter new password"
+                  value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+              </div>
+              {authError && (
+                <div style={{fontSize:12, color: authError.includes("updated") ? "#22c55e" : "#ee5566",
+                  marginBottom:10, padding:"8px 12px", background:"rgba(255,255,255,.05)", borderRadius:4, lineHeight:1.5}}>{authError}</div>
+              )}
+              <button className="auth-btn" disabled={authLoading} onClick={async () => {
+                if (!newPassword || newPassword.length < 6) { setAuthError("Password must be at least 6 characters."); return; }
+                setAuthLoading(true);
+                const { error } = await supabase.auth.updateUser({ password: newPassword });
+                setAuthLoading(false);
+                if (error) setAuthError(error.message);
+                else { setAuthError("Password updated successfully! Signing you in..."); setTimeout(() => setResetMode(false), 2000); }
+              }}>
+                {authLoading ? "Saving..." : "Save New Password →"}
+              </button>
+            </div>
+
+          ) : (
           <div className="auth-card">
             <div className="auth-title">{authMode === "login" ? "Sign In" : "Create Account"}</div>
             <div style={{ marginBottom: 12 }}>
@@ -597,6 +647,7 @@ export default function App() {
               {authMode === "login" ? <>New here? <span>Create a free account</span></> : <>Already have an account? <span>Sign in</span></>}
             </div>
           </div>
+          )} {/* end resetMode conditional */}
         </div>
       </div>
     </>
