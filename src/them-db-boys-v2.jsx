@@ -582,10 +582,36 @@ export default function App() {
               <button className="auth-btn" disabled={authLoading} onClick={async () => {
                 if (!newPassword || newPassword.length < 6) { setAuthError("Password must be at least 6 characters."); return; }
                 setAuthLoading(true);
+                setAuthError("");
+                // Get current session first
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                  // Try to get session from URL token one more time
+                  const hash = window.location.hash;
+                  const params = new URLSearchParams(hash.replace("#", "?"));
+                  const tokenHash = params.get("token_hash");
+                  if (tokenHash) {
+                    const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+                    if (otpError) { setAuthError("Reset link expired. Please request a new one."); setAuthLoading(false); return; }
+                  } else {
+                    setAuthError("Reset link expired. Please request a new one."); setAuthLoading(false); return;
+                  }
+                }
                 const { error } = await supabase.auth.updateUser({ password: newPassword });
                 setAuthLoading(false);
                 if (error) setAuthError(error.message);
-                else { setAuthError("Password updated successfully! Signing you in..."); setTimeout(() => setResetMode(false), 2000); }
+                else {
+                  setAuthError("✅ Password updated! Signing you in...");
+                  setTimeout(async () => {
+                    setResetMode(false);
+                    window.location.hash = "";
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session) {
+                      setUser({ name: session.user.email, role: "athlete" });
+                      setScreen("app");
+                    }
+                  }, 2000);
+                }
               }}>
                 {authLoading ? "Saving..." : "Save New Password →"}
               </button>
