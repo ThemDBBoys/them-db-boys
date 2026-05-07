@@ -440,6 +440,7 @@ export default function App() {
   const [role, setRole] = useState("athlete");
   const [tab, setTab] = useState("home");
   const [user, setUser] = useState(null);
+  const [accessLevel, setAccessLevel] = useState(1); // 1=Starter Kit, 2=Mini Course, 3=Blueprint
   const [openCourse, setOpenCourse] = useState(null);
   const [completed, setCompleted] = useState(new Set());
   const [bookModal, setBookModal] = useState(null);
@@ -461,20 +462,67 @@ export default function App() {
   const [otpSent, setOtpSent] = useState(false);
   const [newPassword, setNewPassword] = useState("");
 
+  // Load access level from Supabase for a user
+  async function loadAccessLevel(userId) {
+    try {
+      const { data } = await supabase
+        .from('user_access')
+        .select('access_level')
+        .eq('user_id', userId)
+        .single();
+      if (data) setAccessLevel(data.access_level);
+    } catch (err) {
+      setAccessLevel(1); // default to starter kit
+    }
+  }
+
+  // Save access level to Supabase
+  async function saveAccessLevel(userId, level) {
+    try {
+      await supabase.from('user_access').upsert({
+        user_id: userId,
+        access_level: level,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+      setAccessLevel(level);
+    } catch (err) {
+      console.log('Access level save error:', err);
+    }
+  }
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check URL for access parameter from Stan Store redirect
+    const params = new URLSearchParams(window.location.search);
+    const accessParam = params.get('access');
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
+        // If coming from Stan Store with access param — save the new level
+        if (accessParam) {
+          const newLevel = parseInt(accessParam);
+          if (newLevel >= 1 && newLevel <= 3) {
+            await saveAccessLevel(session.user.id, newLevel);
+          }
+          // Clean URL
+          window.history.replaceState({}, '', window.location.pathname);
+        } else {
+          // Load existing access level from Supabase
+          await loadAccessLevel(session.user.id);
+        }
       }
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
+        await loadAccessLevel(session.user.id);
       } else if (!session) {
         setUser(null);
         setScreen("auth");
+        setAccessLevel(1);
       }
     });
     return () => subscription.unsubscribe();
@@ -520,7 +568,7 @@ export default function App() {
     setPayForm({ card: "", exp: "", cvv: "", name: "" });
     if (isCourse) {
       setHasCourse(true);
-      setSuccessMsg({ icon: "🔒", title: "ACCESS UNLOCKED", msg: "DB Blueprint is yours. All training videos, the recruiting roadmap, mindset modules, and grades guide are now open. Let's get to work.", btn: "Start Training" });
+      setSuccessMsg({ icon: "🔒", title: "ACCESS UNLOCKED", msg: "The Cornerback Blueprint is yours. All training videos, the recruiting roadmap, mindset modules, and grades guide are now open. Let's get to work.", btn: "Start Training" });
     } else {
       setBookings(prev => [{ id: Date.now(), athlete: user?.name || "You", session: sess?.title, date: "Mar 20", time: timeSlot, status: "confirmed", price: sess?.price }, ...prev]);
       setSuccessMsg({ icon: "✅", title: "SESSION BOOKED", msg: `${sess?.title} confirmed for ${timeSlot}. Stefan will see you on the field. Check your email for details.`, btn: "Back to App" });
@@ -550,10 +598,10 @@ export default function App() {
             <div className="auth-card">
               <div className="auth-title">Check Your Email</div>
               <div style={{fontSize:13, color:MID, marginBottom:16, lineHeight:1.6}}>
-                We sent a 6-digit code to <strong style={{color:"#fff"}}>{otpEmail}</strong>. Enter it below along with your new password.
+                We sent an 6-digit code to <strong style={{color:"#fff"}}>{otpEmail}</strong>. Enter it below along with your new password.
               </div>
               <div className="auth-field">
-                <label className="auth-label">6-Digit Code</label>
+                <label className="auth-label">8-Digit Code</label>
                 <input className="auth-input" type="text" placeholder="123456" maxLength={6}
                   value={otpCode} onChange={e => setOtpCode(e.target.value.replace(/\D/g, ""))}
                   style={{letterSpacing:"0.3em", fontSize:20, textAlign:"center"}} />
@@ -650,14 +698,17 @@ export default function App() {
                       setAuthError("");
                       const { error } = await supabase.auth.signInWithOtp({
                         email: authEmail,
-                        options: { shouldCreateUser: false }
+                        options: { 
+                          shouldCreateUser: false,
+                          emailRedirectTo: undefined
+                        }
                       });
                       setAuthLoading(false);
                       if (error) setAuthError(error.message);
                       else {
                         setOtpEmail(authEmail);
                         setOtpSent(true);
-                        setAuthError("✅ Check your email for a 6-digit code.");
+                        setAuthError("✅ Check your email for an 6-digit code.");
                       }
                     }}>
                     Forgot your password?
@@ -817,11 +868,15 @@ export default function App() {
                     </div>
                   </div>
                   <div style={{display:"flex",gap:8,marginBottom:14}}>
-                    {[["✅","$9 Kit","Unlocked"],["🔒","$27 Add-On","Locked"],["🔒","$67 Blueprint","Locked"]].map(([icon,name,status],i)=>(
-                      <div key={i} style={{flex:1,background:i===0?"rgba(245,197,24,.08)":"rgba(255,255,255,.03)",border:`1px solid ${i===0?"rgba(245,197,24,.25)":BORDER}`,borderRadius:6,padding:"8px 6px",textAlign:"center"}}>
-                        <div style={{fontSize:14,marginBottom:3}}>{icon}</div>
-                        <div style={{fontSize:9,fontWeight:800,color:i===0?"#fff":GRAY,letterSpacing:".04em",lineHeight:1.3}}>{name}</div>
-                        <div style={{fontSize:8,color:i===0?G:GRAY,marginTop:2,fontWeight:700}}>{status}</div>
+                    {[
+                      ["✅","$9 Cornerback Kit", accessLevel >= 1 ? "Unlocked" : "Locked", accessLevel >= 1],
+                      ["📚","$27 Mini Course", accessLevel >= 2 ? "Unlocked" : "Locked", accessLevel >= 2],
+                      ["🏆","$67 Blueprint", accessLevel >= 3 ? "Unlocked" : "Locked", accessLevel >= 3]
+                    ].map(([icon,name,status,unlocked],i)=>(
+                      <div key={i} style={{flex:1,background:unlocked?"rgba(245,197,24,.08)":"rgba(255,255,255,.03)",border:`1px solid ${unlocked?"rgba(245,197,24,.25)":BORDER}`,borderRadius:6,padding:"8px 6px",textAlign:"center"}}>
+                        <div style={{fontSize:14,marginBottom:3}}>{unlocked ? "✅" : "🔒"}</div>
+                        <div style={{fontSize:9,fontWeight:800,color:unlocked?"#fff":GRAY,letterSpacing:".04em",lineHeight:1.3}}>{name}</div>
+                        <div style={{fontSize:8,color:unlocked?G:GRAY,marginTop:2,fontWeight:700}}>{status}</div>
                       </div>
                     ))}
                   </div>
@@ -849,8 +904,8 @@ export default function App() {
             <div style={{margin:"0 16px 20px",borderRadius:10,overflow:"hidden",border:`1px solid rgba(245,197,24,.35)`,background:"linear-gradient(135deg,#111,#141200)"}}>
               <div style={{background:"linear-gradient(135deg,#1a1400,#111)",padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
                 <div style={{position:"absolute",top:14,right:14,background:G,color:"#000",fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2}}>✓ UNLOCKED</div>
-                <div style={{fontSize:10,fontWeight:700,color:G,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 01 · $9 Starter Kit</div>
-                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:"#fff",lineHeight:1,marginBottom:6}}>DB DAILY DRILL STARTER KIT</div>
+                <div style={{fontSize:10,fontWeight:700,color:G,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 01 · $9 · Cornerback Starter Kit</div>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:"#fff",lineHeight:1,marginBottom:6}}>CORNERBACK DAILY DRILL STARTER KIT</div>
                 <div style={{fontSize:12,color:MID,lineHeight:1.5}}>The 5 foundation drills every recruited cornerback needs — plus the 30-day training plan. Your starting point.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
                   <div style={{fontSize:11,color:LG}}>🎥 6 Videos</div>
@@ -893,87 +948,122 @@ export default function App() {
               </div>
             </div>
 
-            {/* ── COURSE 2 — CB FOUNDATIONS — LOCKED ── */}
-            <div style={{margin:"0 16px 20px",borderRadius:10,overflow:"hidden",border:`1px solid ${BORDER}`,background:CARD}}>
-              <div style={{background:CARD2,padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
-                <div style={{position:"absolute",top:14,right:14,background:"rgba(255,255,255,.06)",color:MID,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:`1px solid ${BORDER}`}}>🔒 LOCKED</div>
-                <div style={{fontSize:10,fontWeight:700,color:MID,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 02 · $27 Add-On</div>
-                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:LG,lineHeight:1,marginBottom:6}}>CB FOUNDATIONS MINI COURSE</div>
-                <div style={{fontSize:12,color:GRAY,lineHeight:1.5}}>Take the foundation to game speed. Hip flip with a receiver. Press man stance. Three advanced video modules.</div>
+            {/* ── COURSE 2 — CB FOUNDATIONS ── */}
+            <div style={{margin:"0 16px 20px",borderRadius:10,overflow:"hidden",border:`1px solid ${accessLevel >= 2 ? "rgba(245,197,24,.35)" : BORDER}`,background:accessLevel >= 2 ? "linear-gradient(135deg,#111,#141200)" : CARD}}>
+              <div style={{background:accessLevel >= 2 ? "linear-gradient(135deg,#1a1400,#111)" : CARD2,padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
+                <div style={{position:"absolute",top:14,right:14,background:accessLevel >= 2 ? G : "rgba(255,255,255,.06)",color:accessLevel >= 2 ? "#000" : MID,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:accessLevel >= 2 ? "none" : `1px solid ${BORDER}`}}>{accessLevel >= 2 ? "✓ UNLOCKED" : "🔒 LOCKED"}</div>
+                <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 2 ? G : MID,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 02 · $27 · Cornerback Mini Course</div>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:accessLevel >= 2 ? "#fff" : LG,lineHeight:1,marginBottom:6}}>CORNERBACK FOUNDATIONS MINI COURSE</div>
+                <div style={{fontSize:12,color:accessLevel >= 2 ? MID : GRAY,lineHeight:1.5}}>Take the foundation to game speed. Backpedal mastery, W drill, and press man stance. 4 advanced video modules.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
-                  <div style={{fontSize:11,color:GRAY}}>🎥 3 Modules</div>
-                  <div style={{fontSize:11,color:GRAY}}>⚡ Game Speed</div>
-                  <div style={{fontSize:11,color:GRAY}}>👤 Partner Required</div>
+                  <div style={{fontSize:11,color:accessLevel >= 2 ? LG : GRAY}}>🎥 4 Modules</div>
+                  <div style={{fontSize:11,color:accessLevel >= 2 ? LG : GRAY}}>⚡ Game Speed</div>
+                  <div style={{fontSize:11,color:accessLevel >= 2 ? LG : GRAY}}>👤 Advanced Technique</div>
                 </div>
               </div>
               <div style={{padding:"12px 18px"}}>
-                {["Module 1 — Backpedal at Full Game Speed","Module 2 — Hip Flip With a Receiver Present","Module 3 — Press Man Stance, Hands & First Step"].map((m,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<2?`1px solid ${BORDER}`:"none",opacity:.55}}>
-                    <div style={{width:32,height:32,borderRadius:6,background:"rgba(255,255,255,.04)",border:`1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                      <span style={{fontSize:13,color:GRAY}}>🔒</span>
+                {[
+                  {id:"B07dfCzYvNk", title:"V1 — Backpedal at Full Game Speed"},
+                  {id:"tXy7W188Ou8", title:"V2 — Backpedal Mastery"},
+                  {id:"0ue4nTrDlEg", title:"V3 — Backpedal The W Drill"},
+                  {id:"nViR_3LJpAI", title:"V4 — Press Man Stance"},
+                ].map((v,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<3?`1px solid ${BORDER}`:"none",cursor:accessLevel >= 2 ? "pointer" : "default",opacity:accessLevel >= 2 ? 1 : .55}}
+                    onClick={()=>accessLevel >= 2 ? window.open(`https://www.youtube.com/watch?v=${v.id}`,"_blank") : null}>
+                    <div style={{width:32,height:32,borderRadius:6,background:accessLevel >= 2 ? G : "rgba(255,255,255,.04)",border:accessLevel >= 2 ? "none" : `1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      <span style={{fontSize:12,color:accessLevel >= 2 ? "#000" : GRAY}}>{accessLevel >= 2 ? "▶" : "🔒"}</span>
                     </div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:600,color:MID,lineHeight:1.3}}>{m}</div>
+                      <div style={{fontSize:13,fontWeight:600,color:accessLevel >= 2 ? "#fff" : MID,lineHeight:1.3}}>{v.title}</div>
                     </div>
+                    {accessLevel >= 2 && <span style={{fontSize:9,fontWeight:800,color:G,letterSpacing:".08em",textTransform:"uppercase"}}>WATCH</span>}
                   </div>
                 ))}
-                <button style={{width:"100%",marginTop:14,background:G,color:"#000",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
-                  onClick={()=>alert("Redirecting to checkout — $27")}>
-                  Unlock This Course — $27 →
-                </button>
+                {accessLevel < 2 && (
+                  <button style={{width:"100%",marginTop:14,background:G,color:"#000",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
+                    onClick={()=>window.open("https://stan.store/themdbboys/p/cornerback-foundations-mini-course","_blank")}>
+                    Unlock This Course — $27 →
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* ── COURSE 3 — FULL BLUEPRINT — LOCKED ── */}
-            <div style={{margin:"0 16px 32px",borderRadius:10,overflow:"hidden",border:`1px solid rgba(200,16,46,.2)`,background:CARD}}>
-              <div style={{background:"linear-gradient(135deg,#110000,#111)",padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
-                <div style={{position:"absolute",top:14,right:14,background:"rgba(200,16,46,.12)",color:RED,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:"1px solid rgba(200,16,46,.25)"}}>🏆 UPGRADE</div>
-                <div style={{fontSize:10,fontWeight:700,color:RED,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏆 Course 03 · $67 Today Only</div>
-                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:LG,lineHeight:1,marginBottom:6}}>THE FULL DB BLUEPRINT</div>
-                <div style={{fontSize:12,color:GRAY,lineHeight:1.5}}>9 complete cornerback modules. Press coverage, zone, route recognition, film study, recruiting roadmap, mindset system, and Mom's Corner.</div>
+            {/* ── COURSE 3 — BLUEPRINT ── */}
+            <div style={{margin:"0 16px 32px",borderRadius:10,overflow:"hidden",border:`1px solid ${accessLevel >= 3 ? "rgba(245,197,24,.35)" : "rgba(200,16,46,.2)"}`,background:accessLevel >= 3 ? "linear-gradient(135deg,#111,#141200)" : CARD}}>
+              <div style={{background:accessLevel >= 3 ? "linear-gradient(135deg,#1a1400,#111)" : "linear-gradient(135deg,#110000,#111)",padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
+                <div style={{position:"absolute",top:14,right:14,background:accessLevel >= 3 ? G : "rgba(200,16,46,.12)",color:accessLevel >= 3 ? "#000" : RED,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:accessLevel >= 3 ? "none" : "1px solid rgba(200,16,46,.25)"}}>{accessLevel >= 3 ? "✓ UNLOCKED" : "🏆 UPGRADE"}</div>
+                <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 3 ? G : RED,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏆 Course 03 · $67 · The Blueprint</div>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:accessLevel >= 3 ? "#fff" : LG,lineHeight:1,marginBottom:6}}>THE CORNERBACK BLUEPRINT</div>
+                <div style={{fontSize:12,color:accessLevel >= 3 ? MID : GRAY,lineHeight:1.5}}>7 complete cornerback modules. Press coverage, zone coverages, off man, route recognition, film study, getting recruited, and Mom's Corner.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
-                  <div style={{fontSize:11,color:GRAY}}>🎥 9 Modules</div>
-                  <div style={{fontSize:11,color:GRAY}}>👩 Mom's Corner</div>
-                  <div style={{fontSize:11,color:GRAY}}>📍 Recruiting Roadmap</div>
-                  <div style={{fontSize:11,color:GRAY}}>♾ Lifetime Access</div>
+                  <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>🎥 7 Modules</div>
+                  <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>👩 Mom's Corner</div>
+                  <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>📍 Getting Recruited</div>
+                  <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>♾ Lifetime Access</div>
                 </div>
               </div>
               <div style={{padding:"12px 18px"}}>
-                {["Module 1 — The CB Mindset System","Module 2 — Stance & Alignment in Scheme","Module 3 — Backpedal Mastery in Coverage","Module 4 — Full Press Man Coverage System","Module 5 — Off-Man & Zone Coverage","Modules 6–9 + Recruiting Roadmap..."].map((m,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:i<5?`1px solid ${BORDER}`:"none",opacity:.5}}>
-                    <div style={{width:32,height:32,borderRadius:6,background:"rgba(255,255,255,.03)",border:`1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                      <span style={{fontSize:13,color:GRAY}}>🔒</span>
+                {[
+                  {id:"Nlr6BNkGFKU", title:"V1 — Full Press Man Coverage"},
+                  {id:"fvT3uXaXj-o", title:"V2 — Cover 2 Tips & Tricks"},
+                  {id:"wvl4LtIsYXQ", title:"V3 — Cover 3 Tips & Tricks"},
+                  {id:"ImWddXADrLE", title:"V4 — Off Man Coverage Techniques"},
+                  {id:"ax8vG6PqJik", title:"V5 — Getting Recruited"},
+                  {id:"OMSnJ7QGyVg", title:"V6 — Route Recognition"},
+                  {id:"j6An5sez0Dk", title:"V7 — Film Study Tips & Tricks"},
+                ].map((v,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:i<6?`1px solid ${BORDER}`:"none",cursor:accessLevel >= 3 ? "pointer" : "default",opacity:accessLevel >= 3 ? 1 : .5}}
+                    onClick={()=>accessLevel >= 3 ? window.open(`https://www.youtube.com/watch?v=${v.id}`,"_blank") : null}>
+                    <div style={{width:32,height:32,borderRadius:6,background:accessLevel >= 3 ? G : "rgba(255,255,255,.03)",border:accessLevel >= 3 ? "none" : `1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      <span style={{fontSize:12,color:accessLevel >= 3 ? "#000" : GRAY}}>{accessLevel >= 3 ? "▶" : "🔒"}</span>
                     </div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:600,color:GRAY,lineHeight:1.3}}>{m}</div>
+                      <div style={{fontSize:13,fontWeight:600,color:accessLevel >= 3 ? "#fff" : GRAY,lineHeight:1.3}}>{v.title}</div>
                     </div>
+                    {accessLevel >= 3 && <span style={{fontSize:9,fontWeight:800,color:G,letterSpacing:".08em",textTransform:"uppercase"}}>WATCH</span>}
                   </div>
                 ))}
 
-                {/* MOM'S CORNER PREVIEW — locked */}
-                <div style={{marginTop:14,background:"rgba(255,255,255,.03)",border:`1px solid ${BORDER}`,borderRadius:8,padding:"14px",opacity:.55}}>
-                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-                    <span style={{fontSize:18}}>👩🏾</span>
-                    <div>
-                      <div style={{fontSize:12,fontWeight:800,color:LG,textTransform:"uppercase",letterSpacing:".08em"}}>Mom's Corner</div>
-                      <div style={{fontSize:11,color:GRAY}}>Locked — included in Blueprint</div>
+                {/* MOM'S CORNER */}
+                {accessLevel >= 3 ? (
+                  <div style={{marginTop:14,background:"rgba(245,197,24,.06)",border:`1px solid rgba(245,197,24,.2)`,borderRadius:8,padding:"14px"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <span style={{fontSize:16}}>👩🏾</span>
+                      <div style={{fontSize:11,fontWeight:800,color:G,textTransform:"uppercase",letterSpacing:".08em"}}>Mom's Corner — Unlocked</div>
                     </div>
-                    <span style={{marginLeft:"auto",fontSize:14,color:GRAY}}>🔒</span>
+                    {["The Recruiting Timeline","NCAA Eligibility Explained","How to Evaluate a Trainer","How to Support Without Overcoaching","Local Camps & Exposure Events"].map((t,i)=>(
+                      <div key={i} style={{fontSize:12,color:LG,padding:"5px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.06)`:"none",display:"flex",alignItems:"center",gap:8}}>
+                        <span style={{color:G,fontSize:10}}>✦</span>{t}
+                      </div>
+                    ))}
                   </div>
-                  {["The Recruiting Timeline","NCAA Eligibility Explained","How to Evaluate a Trainer","How to Support Without Overcoaching","Local Camps & Exposure Events"].map((t,i)=>(
-                    <div key={i} style={{fontSize:12,color:GRAY,padding:"5px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.04)`:"none",display:"flex",alignItems:"center",gap:8}}>
-                      <span style={{color:GRAY,fontSize:10}}>🔒</span>{t}
+                ) : (
+                  <div style={{marginTop:14,background:"rgba(255,255,255,.03)",border:`1px solid ${BORDER}`,borderRadius:8,padding:"14px",opacity:.55}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <span style={{fontSize:16}}>👩🏾</span>
+                      <div style={{fontSize:11,fontWeight:800,color:LG,textTransform:"uppercase",letterSpacing:".08em"}}>Mom's Corner</div>
+                      <span style={{marginLeft:"auto",fontSize:12,color:GRAY}}>🔒</span>
                     </div>
-                  ))}
-                </div>
-                <div style={{background:"rgba(200,16,46,.05)",border:"1px solid rgba(200,16,46,.18)",borderRadius:6,padding:"10px 14px",margin:"14px 0",textAlign:"center"}}>
-                  <div style={{fontSize:11,color:RED,fontWeight:700,marginBottom:3}}>⚡ Starter Kit Customer Price</div>
-                  <div style={{fontSize:11,color:MID,lineHeight:1.5}}>You bought the Starter Kit — upgrade to the full Blueprint for <strong style={{color:"#fff"}}>$67</strong> instead of $97. This offer is only available inside the app.</div>
-                </div>
-                <button style={{width:"100%",background:RED,color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
-                  onClick={()=>alert("Redirecting to Blueprint upgrade — $67")}>
-                  Unlock the Full Blueprint — $67 →
-                </button>
+                    {["The Recruiting Timeline","NCAA Eligibility Explained","How to Evaluate a Trainer","How to Support Without Overcoaching","Local Camps & Exposure Events"].map((t,i)=>(
+                      <div key={i} style={{fontSize:11,color:GRAY,padding:"4px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.04)`:"none",display:"flex",alignItems:"center",gap:6}}>
+                        <span style={{fontSize:9}}>🔒</span>{t}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {accessLevel < 3 && (
+                  <>
+                    <div style={{background:"rgba(200,16,46,.05)",border:"1px solid rgba(200,16,46,.18)",borderRadius:6,padding:"10px 14px",margin:"14px 0",textAlign:"center"}}>
+                      <div style={{fontSize:11,color:RED,fontWeight:700,marginBottom:3}}>⚡ Starter Kit Customer Price</div>
+                      <div style={{fontSize:11,color:MID,lineHeight:1.5}}>Upgrade to the Cornerback Blueprint for <strong style={{color:"#fff"}}>$67</strong> instead of $97. Only available inside the app.</div>
+                    </div>
+                    <button style={{width:"100%",background:RED,color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
+                      onClick={()=>window.open("https://stan.store/themdbboys/p/cornerback-blueprint","_blank")}>
+                      Unlock the Cornerback Blueprint — $67 →
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -1160,7 +1250,7 @@ export default function App() {
               )}
               {(stripeStep === 2 || bookModal.course) && (
                 <>
-                  <div className="mttl">{bookModal.course ? "DB Blueprint" : bookModal.title}</div>
+                  <div className="mttl">{bookModal.course ? "Cornerback Blueprint" : bookModal.title}</div>
                   <div className="msub">
                     {bookModal.course ? "Lifetime access — all videos, recruiting roadmap, Mom's Corner" : `${timeSlot} · ${bookModal.duration}`}
                     <span style={{ color: G, fontWeight: 800, marginLeft: 8 }}>${bookModal.price}</span>
