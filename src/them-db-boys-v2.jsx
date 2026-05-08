@@ -1164,11 +1164,11 @@ export default function App() {
                   <>
                     <div style={{background:"rgba(200,16,46,.05)",border:"1px solid rgba(200,16,46,.18)",borderRadius:6,padding:"10px 14px",margin:"14px 0",textAlign:"center"}}>
                       <div style={{fontSize:11,color:RED,fontWeight:700,marginBottom:3}}>⚡ Starter Kit Customer Price</div>
-                      <div style={{fontSize:11,color:MID,lineHeight:1.5}}>Upgrade to the Cornerback Blueprint for <strong style={{color:"#fff"}}>$67</strong> instead of $97. Only available inside the app.</div>
+                      <div style={{fontSize:11,color:MID,lineHeight:1.5}}>Unlock all 7 Blueprint modules plus Parent's Corner. Exclusive upgrade pricing available inside the app.</div>
                     </div>
                     <button style={{width:"100%",background:RED,color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
-                      onClick={()=>window.open("https://stan.store/themdbboys/p/the-cornerback-blueprint","_blank")}>
-                      Unlock the Cornerback Blueprint — $67 →
+                      onClick={()=>window.open("https://stan.store/themdbboys/p/the-cornerback-blueprint-ria2vz79","_blank")}>
+                      Upgrade to The Cornerback Blueprint →
                     </button>
                   </>
                 )}
