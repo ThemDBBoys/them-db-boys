@@ -558,13 +558,11 @@ export default function App() {
   }
 
   async function handleLogout() {
-    await supabase.auth.signOut();
-    setScreen("auth");
-    setUser(null);
-    setTab("home");
-    setAccessLevel(1);
-    sessionStorage.removeItem('pendingAccessLevel');
-    window.location.href = window.location.pathname;
+    try {
+      await supabase.auth.signOut();
+    } catch(e) {}
+    sessionStorage.clear();
+    window.location.replace(window.location.pathname);
   }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
