@@ -494,21 +494,24 @@ export default function App() {
     // Check URL for access parameter from Stan Store redirect
     const params = new URLSearchParams(window.location.search);
     const accessParam = params.get('access');
+    const pendingLevel = accessParam ? parseInt(accessParam) : null;
+
+    // Store pending access level in sessionStorage so it survives login
+    if (pendingLevel && pendingLevel >= 1 && pendingLevel <= 3) {
+      sessionStorage.setItem('pendingAccessLevel', pendingLevel);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
-        // If coming from Stan Store with access param — save the new level
-        if (accessParam) {
-          const newLevel = parseInt(accessParam);
-          if (newLevel >= 1 && newLevel <= 3) {
-            await saveAccessLevel(session.user.id, newLevel);
-          }
-          // Clean URL
-          window.history.replaceState({}, '', window.location.pathname);
+        // Check for pending access level from Stan Store
+        const pending = sessionStorage.getItem('pendingAccessLevel');
+        if (pending) {
+          await saveAccessLevel(session.user.id, parseInt(pending));
+          sessionStorage.removeItem('pendingAccessLevel');
         } else {
-          // Load existing access level from Supabase
           await loadAccessLevel(session.user.id);
         }
       }
@@ -518,7 +521,14 @@ export default function App() {
       if (event === "SIGNED_IN" && session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
-        await loadAccessLevel(session.user.id);
+        // Check for pending access level from Stan Store
+        const pending = sessionStorage.getItem('pendingAccessLevel');
+        if (pending) {
+          await saveAccessLevel(session.user.id, parseInt(pending));
+          sessionStorage.removeItem('pendingAccessLevel');
+        } else {
+          await loadAccessLevel(session.user.id);
+        }
       } else if (!session) {
         setUser(null);
         setScreen("auth");
@@ -552,6 +562,9 @@ export default function App() {
     setScreen("auth");
     setUser(null);
     setTab("home");
+    setAccessLevel(1);
+    sessionStorage.removeItem('pendingAccessLevel');
+    window.location.href = window.location.pathname;
   }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
