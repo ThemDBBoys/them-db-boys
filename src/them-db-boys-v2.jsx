@@ -567,11 +567,10 @@ export default function App() {
   }
 
   async function handleLogout() {
-    try {
-      await supabase.auth.signOut();
-    } catch(e) {}
+    try { await supabase.auth.signOut(); } catch(e) {}
     sessionStorage.clear();
-    window.location.replace(window.location.pathname);
+    localStorage.clear();
+    window.location.replace('/?logout=true');
   }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
