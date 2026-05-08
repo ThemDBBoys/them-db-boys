@@ -994,10 +994,10 @@ export default function App() {
                 <div style={{position:"absolute",top:14,right:14,background:accessLevel >= 3 ? G : "rgba(200,16,46,.12)",color:accessLevel >= 3 ? "#000" : RED,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:accessLevel >= 3 ? "none" : "1px solid rgba(200,16,46,.25)"}}>{accessLevel >= 3 ? "✓ UNLOCKED" : "🏆 UPGRADE"}</div>
                 <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 3 ? G : RED,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏆 Course 03 · $67 · The Blueprint</div>
                 <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:accessLevel >= 3 ? "#fff" : LG,lineHeight:1,marginBottom:6}}>THE CORNERBACK BLUEPRINT</div>
-                <div style={{fontSize:12,color:accessLevel >= 3 ? MID : GRAY,lineHeight:1.5}}>7 complete cornerback modules. Press coverage, zone coverages, off man, route recognition, film study, getting recruited, and Mom's Corner.</div>
+                <div style={{fontSize:12,color:accessLevel >= 3 ? MID : GRAY,lineHeight:1.5}}>7 complete cornerback modules. Press coverage, zone coverages, off man, route recognition, film study, getting recruited, and Parent's Corner.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
                   <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>🎥 7 Modules</div>
-                  <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>👩 Mom's Corner</div>
+                  <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>👩 Parent's Corner</div>
                   <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>📍 Getting Recruited</div>
                   <div style={{fontSize:11,color:accessLevel >= 3 ? LG : GRAY}}>♾ Lifetime Access</div>
                 </div>
@@ -1027,21 +1027,129 @@ export default function App() {
                 {/* MOM'S CORNER */}
                 {accessLevel >= 3 ? (
                   <div style={{marginTop:14,background:"rgba(245,197,24,.06)",border:`1px solid rgba(245,197,24,.2)`,borderRadius:8,padding:"14px"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                      <span style={{fontSize:16}}>👩🏾</span>
-                      <div style={{fontSize:11,fontWeight:800,color:G,textTransform:"uppercase",letterSpacing:".08em"}}>Mom's Corner — Unlocked</div>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
+                      <span style={{fontSize:16}}>👨‍👩‍👦</span>
+                      <div style={{fontSize:11,fontWeight:800,color:G,textTransform:"uppercase",letterSpacing:".08em"}}>Parent's Corner — Unlocked</div>
                     </div>
-                    {["The Recruiting Timeline","NCAA Eligibility Explained","How to Evaluate a Trainer","How to Support Without Overcoaching","Local Camps & Exposure Events"].map((t,i)=>(
-                      <div key={i} style={{fontSize:12,color:LG,padding:"5px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.06)`:"none",display:"flex",alignItems:"center",gap:8}}>
-                        <span style={{color:G,fontSize:10}}>✦</span>{t}
+
+                    {/* SECTION 1 — RECRUITING TIMELINE */}
+                    <div style={{marginBottom:16,padding:"12px",background:"rgba(0,0,0,.2)",borderRadius:6,borderLeft:`3px solid ${G}`}}>
+                      <div style={{fontSize:11,fontWeight:900,color:G,letterSpacing:".12em",textTransform:"uppercase",marginBottom:8}}>📅 The Recruiting Timeline</div>
+                      {[
+                        {grade:"8th Grade",text:"Start position-specific training now. Run track if offered. Protect the GPA from day one. Play multiple sports to build athleticism."},
+                        {grade:"9th Grade",text:"Register on the NCAA Eligibility Center at eligibilitycenter.org immediately. Every credit and grade counts now. Attend local 7-on-7 events. Start filming full game footage."},
+                        {grade:"10th Grade",text:"Attend regional college camps — this is when coaches start building their boards. Build your first highlight tape on Hudl. Start emailing coaches at 15 to 20 target programs. Begin SAT/ACT prep now."},
+                        {grade:"11th Grade",text:"This is the most critical recruiting year. Junior season film is the most heavily watched by coaches. Handle SAT/ACT scores in the fall. Start campus visits. Update highlight tape after the season."},
+                        {grade:"12th Grade",text:"Early Signing Period is December. Most opportunities are committed by then. Do not let one failed class cost a scholarship. Compare offers carefully — a D2 starter beats a D1 benchwarmer."},
+                      ].map((item,i)=>(
+                        <div key={i} style={{padding:"8px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.05)`:"none"}}>
+                          <div style={{fontSize:11,fontWeight:800,color:"#fff",marginBottom:3}}>{item.grade}</div>
+                          <div style={{fontSize:11,color:MID,lineHeight:1.6}}>{item.text}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* SECTION 2 — NCAA ELIGIBILITY */}
+                    <div style={{marginBottom:16,padding:"12px",background:"rgba(0,0,0,.2)",borderRadius:6,borderLeft:`3px solid ${G}`}}>
+                      <div style={{fontSize:11,fontWeight:900,color:G,letterSpacing:".12em",textTransform:"uppercase",marginBottom:8}}>🎓 NCAA Eligibility — What You Must Know</div>
+                      {[
+                        "NCAA eligibility starts counting credits and GPA beginning in 9th grade — not when your son graduates",
+                        "Division I requires 16 core courses in specific subjects — not just any classes",
+                        "A minimum 2.3 GPA in core courses is required for D1 — higher GPA means full eligibility and more scholarship money",
+                        "One failed core class can disqualify a player that coaches want to offer — this happens every single year",
+                        "Register on the NCAA Eligibility Center at ncaa.org in 9th grade — coaches cannot officially recruit a player who is not registered",
+                        "Division II requires a 2.2 GPA in 16 core courses — slightly lower bar but still requires planning from day one",
+                      ].map((item,i)=>(
+                        <div key={i} style={{fontSize:11,color:MID,lineHeight:1.6,padding:"6px 0",borderBottom:i<5?`1px solid rgba(255,255,255,.05)`:"none",display:"flex",gap:8}}>
+                          <span style={{color:G,flexShrink:0}}>→</span>{item}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* SECTION 3 — SAT/ACT PREP */}
+                    <div style={{marginBottom:16,padding:"12px",background:"rgba(0,0,0,.2)",borderRadius:6,borderLeft:`3px solid ${G}`}}>
+                      <div style={{fontSize:11,fontWeight:900,color:G,letterSpacing:".12em",textTransform:"uppercase",marginBottom:8}}>📝 SAT/ACT Prep — Start in 10th Grade</div>
+                      <div style={{fontSize:11,color:MID,lineHeight:1.6,marginBottom:8}}>A low test score can disqualify a player that coaches want to offer. Aim for a 23 or higher on the ACT for most D1 programs. A 27 opens even more doors.</div>
+                      <div style={{fontSize:11,color:MID,lineHeight:1.6,marginBottom:8}}>Stefan's sister used PrepMedians to raise her score by 6 points. Start early and treat it like a position drill — reps every day adds up.</div>
+                      <a href="https://www.prepmedians.com" target="_blank" style={{display:"inline-block",background:G,color:"#000",padding:"8px 16px",borderRadius:3,fontSize:11,fontWeight:900,textDecoration:"none",letterSpacing:".08em",textTransform:"uppercase"}}>Visit PrepMedians →</a>
+                    </div>
+
+                    {/* SECTION 4 — HOW TO EVALUATE A TRAINER */}
+                    <div style={{marginBottom:16,padding:"12px",background:"rgba(0,0,0,.2)",borderRadius:6,borderLeft:`3px solid ${G}`}}>
+                      <div style={{fontSize:11,fontWeight:900,color:G,letterSpacing:".12em",textTransform:"uppercase",marginBottom:8}}>🔍 How to Evaluate a Trainer</div>
+                      {[
+                        "Do they play or have they played at the position they are training — position specific experience matters",
+                        "Do they teach technique or just run drills — technique coaching shows up on film, generic drills do not",
+                        "Can they explain why each drill matters to college coaches — trainers who understand recruiting are worth 10x more",
+                        "Do they have references from athletes who got offers or scholarships — results are the only thing that matters",
+                        "Are they teaching your son to think on the field or just react — football IQ is what separates recruited players",
+                      ].map((item,i)=>(
+                        <div key={i} style={{fontSize:11,color:MID,lineHeight:1.6,padding:"6px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.05)`:"none",display:"flex",gap:8}}>
+                          <span style={{color:G,flexShrink:0}}>✦</span>{item}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* SECTION 5 — HOW TO SUPPORT WITHOUT OVERCOACHING */}
+                    <div style={{marginBottom:16,padding:"12px",background:"rgba(0,0,0,.2)",borderRadius:6,borderLeft:`3px solid ${G}`}}>
+                      <div style={{fontSize:11,fontWeight:900,color:G,letterSpacing:".12em",textTransform:"uppercase",marginBottom:8}}>💪 How to Support Without Overcoaching</div>
+                      {[
+                        {do:true,text:"Show up to games and practices consistently — your presence matters more than your coaching"},
+                        {do:true,text:"Ask how he felt about his performance — let him lead the evaluation"},
+                        {do:true,text:"Handle logistics — camps, emails to coaches, eligibility paperwork — this is your lane"},
+                        {do:true,text:"Celebrate effort and consistency not just big plays"},
+                        {do:false,text:"Do not coach him from the sideline during games — coaches notice and it reflects poorly"},
+                        {do:false,text:"Do not contact coaches on his behalf — he needs to build those relationships himself"},
+                        {do:false,text:"Do not compare him to other recruits — his path is his own"},
+                      ].map((item,i)=>(
+                        <div key={i} style={{fontSize:11,color:MID,lineHeight:1.6,padding:"6px 0",borderBottom:i<6?`1px solid rgba(255,255,255,.05)`:"none",display:"flex",gap:8,alignItems:"flex-start"}}>
+                          <span style={{color:item.do?G:RED,flexShrink:0,fontWeight:900}}>{item.do?"✓":"✗"}</span>{item.text}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* SECTION 6 — CAMPS AND EXPOSURE EVENTS */}
+                    <div style={{padding:"12px",background:"rgba(0,0,0,.2)",borderRadius:6,borderLeft:`3px solid ${G}`}}>
+                      <div style={{fontSize:11,fontWeight:900,color:G,letterSpacing:".12em",textTransform:"uppercase",marginBottom:8}}>🏕️ Finding Local & Regional Camps</div>
+                      <div style={{fontSize:11,color:MID,lineHeight:1.6,marginBottom:10}}>Start local — camps within driving distance are the best value for younger players. As your son develops move to regional exposure events where college coaches are watching.</div>
+
+                      <div style={{fontSize:10,fontWeight:900,color:G,letterSpacing:".1em",textTransform:"uppercase",marginBottom:6}}>Find Local Camps:</div>
+                      {[
+                        {name:"footballcampsusa.com",desc:"Search by state or zip code — best for finding local D1 D2 and NAIA prospect camps near you"},
+                        {name:"ncsasports.org/football/camps",desc:"NCSA camp finder — search by location — also create a free recruiting profile so coaches can find your son"},
+                        {name:"ryzer.com",desc:"Search upcoming college prospect camps by zip code"},
+                      ].map((item,i)=>(
+                        <div key={i} style={{padding:"6px 0",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
+                          <div style={{fontSize:11,fontWeight:800,color:"#fff"}}>{item.name}</div>
+                          <div style={{fontSize:11,color:MID,lineHeight:1.5}}>{item.desc}</div>
+                        </div>
+                      ))}
+
+                      <div style={{fontSize:10,fontWeight:900,color:G,letterSpacing:".1em",textTransform:"uppercase",margin:"10px 0 6px"}}>Regional & National Exposure Events:</div>
+                      {[
+                        {name:"Under Armour Next Camp Series",desc:"underarmournext.com — runs February through April nationally — top performers earn the right to play in the UA All-America Game"},
+                        {name:"Rivals Camp Series",desc:"The nation's largest free high school football combine series — must earn nomination or be selected as top performer to qualify"},
+                        {name:"Nike Football Camps",desc:"Dozens of camps in 12 states — ages 8 to 18 — usasportscamps.com"},
+                        {name:"VTO Sports Elite 100 Showcase",desc:"vtosports.net — hosted at college stadiums — athletes can receive college offers onsite"},
+                        {name:"EXACT Sports",desc:"exactsports.com — over 1000 NCAA coaches in their network — professional video footage at every event"},
+                      ].map((item,i)=>(
+                        <div key={i} style={{padding:"6px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.05)`:"none"}}>
+                          <div style={{fontSize:11,fontWeight:800,color:"#fff"}}>{item.name}</div>
+                          <div style={{fontSize:11,color:MID,lineHeight:1.5}}>{item.desc}</div>
+                        </div>
+                      ))}
+
+                      <div style={{marginTop:10,padding:"8px 12px",background:"rgba(245,197,24,.08)",borderRadius:4,fontSize:11,color:MID,lineHeight:1.6}}>
+                        💡 <strong style={{color:"#fff"}}>Pro tip:</strong> Before any camp email the coach and let them know your son will be there. This gets his name on a watch list before he even walks in the door.
                       </div>
-                    ))}
+                    </div>
+
                   </div>
                 ) : (
                   <div style={{marginTop:14,background:"rgba(255,255,255,.03)",border:`1px solid ${BORDER}`,borderRadius:8,padding:"14px",opacity:.55}}>
                     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                       <span style={{fontSize:16}}>👩🏾</span>
-                      <div style={{fontSize:11,fontWeight:800,color:LG,textTransform:"uppercase",letterSpacing:".08em"}}>Mom's Corner</div>
+                      <div style={{fontSize:11,fontWeight:800,color:LG,textTransform:"uppercase",letterSpacing:".08em"}}>Parent's Corner</div>
                       <span style={{marginLeft:"auto",fontSize:12,color:GRAY}}>🔒</span>
                     </div>
                     {["The Recruiting Timeline","NCAA Eligibility Explained","How to Evaluate a Trainer","How to Support Without Overcoaching","Local Camps & Exposure Events"].map((t,i)=>(
@@ -1059,7 +1167,7 @@ export default function App() {
                       <div style={{fontSize:11,color:MID,lineHeight:1.5}}>Upgrade to the Cornerback Blueprint for <strong style={{color:"#fff"}}>$67</strong> instead of $97. Only available inside the app.</div>
                     </div>
                     <button style={{width:"100%",background:RED,color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
-                      onClick={()=>window.open("https://stan.store/themdbboys/p/cornerback-blueprint","_blank")}>
+                      onClick={()=>window.open("https://stan.store/themdbboys/p/the-cornerback-blueprint","_blank")}>
                       Unlock the Cornerback Blueprint — $67 →
                     </button>
                   </>
@@ -1252,7 +1360,7 @@ export default function App() {
                 <>
                   <div className="mttl">{bookModal.course ? "Cornerback Blueprint" : bookModal.title}</div>
                   <div className="msub">
-                    {bookModal.course ? "Lifetime access — all videos, recruiting roadmap, Mom's Corner" : `${timeSlot} · ${bookModal.duration}`}
+                    {bookModal.course ? "Lifetime access — all videos, recruiting roadmap, Parent's Corner" : `${timeSlot} · ${bookModal.duration}`}
                     <span style={{ color: G, fontWeight: 800, marginLeft: 8 }}>${bookModal.price}</span>
                   </div>
                   <div className="stripe-wrap">
