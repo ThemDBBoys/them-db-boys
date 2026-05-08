@@ -491,8 +491,19 @@ export default function App() {
   }
 
   useEffect(() => {
-    // Check URL for access parameter from Stan Store redirect
     const params = new URLSearchParams(window.location.search);
+
+    // Check URL for logout parameter
+    if (params.get('logout') === 'true') {
+      supabase.auth.signOut().then(() => {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.replace(window.location.pathname);
+      });
+      return;
+    }
+
+    // Check URL for access parameter from Stan Store redirect
     const accessParam = params.get('access');
     const pendingLevel = accessParam ? parseInt(accessParam) : null;
 
@@ -506,7 +517,6 @@ export default function App() {
       if (session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
-        // Check for pending access level from Stan Store
         const pending = sessionStorage.getItem('pendingAccessLevel');
         if (pending) {
           await saveAccessLevel(session.user.id, parseInt(pending));
@@ -521,7 +531,6 @@ export default function App() {
       if (event === "SIGNED_IN" && session) {
         setUser({ name: session.user.email, role: "athlete" });
         setScreen("app");
-        // Check for pending access level from Stan Store
         const pending = sessionStorage.getItem('pendingAccessLevel');
         if (pending) {
           await saveAccessLevel(session.user.id, parseInt(pending));
