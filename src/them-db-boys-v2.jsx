@@ -440,7 +440,7 @@ export default function App() {
   const [role, setRole] = useState("athlete");
   const [tab, setTab] = useState("home");
   const [user, setUser] = useState(null);
-  const [accessLevel, setAccessLevel] = useState(1); // 1=Starter Kit, 2=Mini Course, 3=Blueprint
+  const [accessLevel, setAccessLevel] = useState(1); // 1=Foundation Kit (Course 1+2), 3=Blueprint+Parent's Corner
   const [openCourse, setOpenCourse] = useState(null);
   const [completed, setCompleted] = useState(new Set());
   const [bookModal, setBookModal] = useState(null);
@@ -476,15 +476,28 @@ export default function App() {
     }
   }
 
-  // Save access level to Supabase
+  // Save access level to Supabase — never downgrade
   async function saveAccessLevel(userId, level) {
     try {
+      let finalLevel = level;
+      // Check existing level first
+      try {
+        const { data: existing } = await supabase
+          .from('user_access')
+          .select('access_level')
+          .eq('user_id', userId)
+          .single();
+        if (existing && existing.access_level > level) {
+          finalLevel = existing.access_level; // never downgrade
+        }
+      } catch(e) {}
+      
       await supabase.from('user_access').upsert({
         user_id: userId,
-        access_level: level,
+        access_level: finalLevel,
         updated_at: new Date().toISOString()
       }, { onConflict: 'user_id' });
-      setAccessLevel(level);
+      setAccessLevel(finalLevel);
     } catch (err) {
       console.log('Access level save error:', err);
     }
@@ -570,7 +583,7 @@ export default function App() {
     try { await supabase.auth.signOut(); } catch(e) {}
     sessionStorage.clear();
     localStorage.clear();
-    window.location.replace('/?logout=true');
+    window.location.replace('https://them-db-boys.vercel.app?logout=true');
   }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
@@ -888,8 +901,8 @@ export default function App() {
                   </div>
                   <div style={{display:"flex",gap:8,marginBottom:14}}>
                     {[
-                      ["✅","$9 Cornerback Kit", accessLevel >= 1 ? "Unlocked" : "Locked", accessLevel >= 1],
-                      ["📚","$27 Mini Course", accessLevel >= 2 ? "Unlocked" : "Locked", accessLevel >= 2],
+                      ["✅","Elite DB Foundation Kit", accessLevel >= 1 ? "Unlocked" : "Locked", accessLevel >= 1],
+                      ["📚","Course 2 — Advanced Modules", accessLevel >= 1 ? "Unlocked" : "Locked", accessLevel >= 1],
                       ["🏆","$67 Blueprint", accessLevel >= 3 ? "Unlocked" : "Locked", accessLevel >= 3]
                     ].map(([icon,name,status,unlocked],i)=>(
                       <div key={i} style={{flex:1,background:unlocked?"rgba(245,197,24,.08)":"rgba(255,255,255,.03)",border:`1px solid ${unlocked?"rgba(245,197,24,.25)":BORDER}`,borderRadius:6,padding:"8px 6px",textAlign:"center"}}>
@@ -924,7 +937,7 @@ export default function App() {
               <div style={{background:"linear-gradient(135deg,#1a1400,#111)",padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
                 <div style={{position:"absolute",top:14,right:14,background:G,color:"#000",fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2}}>✓ UNLOCKED</div>
                 <div style={{fontSize:10,fontWeight:700,color:G,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 01 · $9 · Cornerback Starter Kit</div>
-                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:"#fff",lineHeight:1,marginBottom:6}}>CORNERBACK DAILY DRILL STARTER KIT</div>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:"#fff",lineHeight:1,marginBottom:6}}>ELITE DB FOUNDATION KIT</div>
                 <div style={{fontSize:12,color:MID,lineHeight:1.5}}>The 5 foundation drills every recruited cornerback needs — plus the 30-day training plan. Your starting point.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
                   <div style={{fontSize:11,color:LG}}>🎥 6 Videos</div>
@@ -968,16 +981,16 @@ export default function App() {
             </div>
 
             {/* ── COURSE 2 — CB FOUNDATIONS ── */}
-            <div style={{margin:"0 16px 20px",borderRadius:10,overflow:"hidden",border:`1px solid ${accessLevel >= 2 ? "rgba(245,197,24,.35)" : BORDER}`,background:accessLevel >= 2 ? "linear-gradient(135deg,#111,#141200)" : CARD}}>
-              <div style={{background:accessLevel >= 2 ? "linear-gradient(135deg,#1a1400,#111)" : CARD2,padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
-                <div style={{position:"absolute",top:14,right:14,background:accessLevel >= 2 ? G : "rgba(255,255,255,.06)",color:accessLevel >= 2 ? "#000" : MID,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:accessLevel >= 2 ? "none" : `1px solid ${BORDER}`}}>{accessLevel >= 2 ? "✓ UNLOCKED" : "🔒 LOCKED"}</div>
-                <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 2 ? G : MID,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 02 · $27 · Cornerback Mini Course</div>
-                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:accessLevel >= 2 ? "#fff" : LG,lineHeight:1,marginBottom:6}}>CORNERBACK FOUNDATIONS MINI COURSE</div>
-                <div style={{fontSize:12,color:accessLevel >= 2 ? MID : GRAY,lineHeight:1.5}}>Take the foundation to game speed. Backpedal mastery, W drill, and press man stance. 4 advanced video modules.</div>
+            <div style={{margin:"0 16px 20px",borderRadius:10,overflow:"hidden",border:`1px solid ${accessLevel >= 1 ? "rgba(245,197,24,.35)" : BORDER}`,background:accessLevel >= 1 ? "linear-gradient(135deg,#111,#141200)" : CARD}}>
+              <div style={{background:accessLevel >= 1 ? "linear-gradient(135deg,#1a1400,#111)" : CARD2,padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
+                <div style={{position:"absolute",top:14,right:14,background:accessLevel >= 1 ? G : "rgba(255,255,255,.06)",color:accessLevel >= 1 ? "#000" : MID,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:accessLevel >= 1 ? "none" : `1px solid ${BORDER}`}}>{accessLevel >= 1 ? "✓ UNLOCKED" : "🔒 LOCKED"}</div>
+                <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 1 ? G : MID,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏈 Course 02 · Advanced Training Modules</div>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:accessLevel >= 1 ? "#fff" : LG,lineHeight:1,marginBottom:6}}>CORNERBACK FOUNDATIONS — ADVANCED MODULES</div>
+                <div style={{fontSize:12,color:accessLevel >= 1 ? MID : GRAY,lineHeight:1.5}}>Take the foundation to game speed. Backpedal mastery, W drill, and press man stance. 4 advanced video modules.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
-                  <div style={{fontSize:11,color:accessLevel >= 2 ? LG : GRAY}}>🎥 4 Modules</div>
-                  <div style={{fontSize:11,color:accessLevel >= 2 ? LG : GRAY}}>⚡ Game Speed</div>
-                  <div style={{fontSize:11,color:accessLevel >= 2 ? LG : GRAY}}>👤 Advanced Technique</div>
+                  <div style={{fontSize:11,color:accessLevel >= 1 ? LG : GRAY}}>🎥 4 Modules</div>
+                  <div style={{fontSize:11,color:accessLevel >= 1 ? LG : GRAY}}>⚡ Game Speed</div>
+                  <div style={{fontSize:11,color:accessLevel >= 1 ? LG : GRAY}}>👤 Advanced Technique</div>
                 </div>
               </div>
               <div style={{padding:"12px 18px"}}>
@@ -987,23 +1000,17 @@ export default function App() {
                   {id:"0ue4nTrDlEg", title:"V3 — Backpedal The W Drill"},
                   {id:"nViR_3LJpAI", title:"V4 — Press Man Stance"},
                 ].map((v,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<3?`1px solid ${BORDER}`:"none",cursor:accessLevel >= 2 ? "pointer" : "default",opacity:accessLevel >= 2 ? 1 : .55}}
-                    onClick={()=>accessLevel >= 2 ? window.open(`https://www.youtube.com/watch?v=${v.id}`,"_blank") : null}>
-                    <div style={{width:32,height:32,borderRadius:6,background:accessLevel >= 2 ? G : "rgba(255,255,255,.04)",border:accessLevel >= 2 ? "none" : `1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                      <span style={{fontSize:12,color:accessLevel >= 2 ? "#000" : GRAY}}>{accessLevel >= 2 ? "▶" : "🔒"}</span>
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<3?`1px solid ${BORDER}`:"none",cursor:accessLevel >= 1 ? "pointer" : "default",opacity:accessLevel >= 1 ? 1 : .55}}
+                    onClick={()=>accessLevel >= 1 ? window.open(`https://www.youtube.com/watch?v=${v.id}`,"_blank") : null}>
+                    <div style={{width:32,height:32,borderRadius:6,background:accessLevel >= 1 ? G : "rgba(255,255,255,.04)",border:accessLevel >= 1 ? "none" : `1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      <span style={{fontSize:12,color:accessLevel >= 1 ? "#000" : GRAY}}>{accessLevel >= 1 ? "▶" : "🔒"}</span>
                     </div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:600,color:accessLevel >= 2 ? "#fff" : MID,lineHeight:1.3}}>{v.title}</div>
+                      <div style={{fontSize:13,fontWeight:600,color:accessLevel >= 1 ? "#fff" : MID,lineHeight:1.3}}>{v.title}</div>
                     </div>
-                    {accessLevel >= 2 && <span style={{fontSize:9,fontWeight:800,color:G,letterSpacing:".08em",textTransform:"uppercase"}}>WATCH</span>}
+                    {accessLevel >= 1 && <span style={{fontSize:9,fontWeight:800,color:G,letterSpacing:".08em",textTransform:"uppercase"}}>WATCH</span>}
                   </div>
                 ))}
-                {accessLevel < 2 && (
-                  <button style={{width:"100%",marginTop:14,background:G,color:"#000",border:"none",cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"13px",borderRadius:3}}
-                    onClick={()=>window.open("https://stan.store/themdbboys/p/cornerback-foundations-mini-course","_blank")}>
-                    Unlock This Course — $27 →
-                  </button>
-                )}
               </div>
             </div>
 
