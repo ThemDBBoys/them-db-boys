@@ -395,23 +395,29 @@ const DRILLS = {
     { id: 13, name: "Sat — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills at full speed ⚡ · 5 reps each · Film everything", tag: "Film Day" },
     { id: 14, name: "Sun — REST. Review film. Write 1 thing you want to fix next week. Rest fully.", tag: "Rest" },
   ],
-  "Week 3 — Game Speed · Mon–Sat · Rest Sunday · Full Speed": [
-    { id: 15, name: "Mon — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills at FULL game speed ⚡ · 5 reps each · No slowing down", tag: "All 5 Drills" },
-    { id: 16, name: "Tue — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills · 5 reps each · Add partner for trail technique and mental reset reps", tag: "All 5 Drills" },
-    { id: 17, name: "Wed — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills · 5 reps each · Film yourself · Compare to Week 1 film", tag: "All 5 Drills" },
-    { id: 18, name: "Thu — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills at full speed · 5 reps each · Focus: press stance hold 3 seconds each rep", tag: "All 5 Drills" },
-    { id: 19, name: "Fri — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills · 5 reps each · Focus: mental reset in live coverage — get beaten 5 times and reset each rep", tag: "All 5 Drills" },
-    { id: 20, name: "Sat — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills at max speed ⚡ · 5 reps each · Film everything — this is potential recruiting tape", tag: "Film Day" },
-    { id: 21, name: "Sun — REST. 3 weeks done. Your body is building. Rest fully. Week 4 is the proving ground.", tag: "Rest" },
+  "Week 3 — Game Speed + Course 2 Intro · Mon–Sat · Rest Sunday · Full Speed": [
+    { id: 15, name: "Mon — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills at FULL game speed ⚡ · 5 reps each · No slowing down · New this week: 📺 C2-V1: Backpedal Mastery — watch before practice", tag: "All 5 + C2 Intro" },
+    { id: 16, name: "Tue — 🔥 Stretch → 🪜 Ladder → 📺 C2-V1: Backpedal Mastery · 5 reps · 📺 V1–V5 all foundation drills · 5 reps each · Add partner for trail and reset reps", tag: "Course 2 Day" },
+    { id: 17, name: "Wed — 🔥 Stretch → 🪜 Ladder → 📺 C2-V2: The W Drill · 5 reps each direction · 📺 V1–V5 · 5 reps each · Film yourself · Compare to Week 1 film", tag: "W Drill Day" },
+    { id: 18, name: "Thu — 🔥 Stretch → 🪜 Ladder → 📺 C2-V1 + C2-V2 · 5 reps each · 📺 V1–V5 foundation drills · 5 reps each · Focus: press stance hold 3 seconds each rep", tag: "All 5 + C2" },
+    { id: 19, name: "Fri — 🔥 Stretch → 🪜 Ladder → 📺 C2-V3: Press Man Stance · 5 reps · 📺 V1–V5 · 5 reps each · Focus: stay square in press before flipping hips", tag: "Press Man Day" },
+    { id: 20, name: "Sat — 🔥 Stretch → 🪜 Ladder → 📺 C2-V1 + C2-V2 + C2-V3 + V1–V5 · All drills · 5 reps each · Film everything — this is potential recruiting tape 🎥", tag: "Film Day" },
+    { id: 21, name: "Sun — REST. 3 weeks done. You now have both courses in your body. Rest fully. Week 4 is the proving ground.", tag: "Rest" },
   ],
   "Week 4 — Prove It · Mon–Sat · Rest Sunday · Recruiting Tape": [
-    { id: 22, name: "Mon — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills at max speed · 5 reps each · Time your backpedal and break ⚡", tag: "All 5 Drills" },
-    { id: 23, name: "Tue — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills · 5 reps each · Hip flip both sides should feel equal now — if not, add 5 more weak side reps", tag: "All 5 Drills" },
-    { id: 24, name: "Wed — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → FILM SESSION ⚡🎥 All 5 drills · 5 reps each · Every rep on camera · This is your recruiting tape", tag: "Recruit Tape" },
-    { id: 25, name: "Thu — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills · 5 reps each · YouTube: 'double move routes DB' — watch 10 reps and write the tell", tag: "All 5 Drills" },
-    { id: 26, name: "Fri — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → All 5 drills · 5 reps each · Add open field tackling form · 5 reps · Head up · Wrap and drive", tag: "All 5 Drills" },
-    { id: 27, name: "Sat — 🔥 Stretch → 🪜 Ladder → 📺 V1–V5 → FULL SHOWCASE 🏆⚡ All 5 drills · 5 reps each · Mental reset after every single rep · Film everything", tag: "Complete" },
+    { id: 22, name: "Mon — 🔥 Stretch → 🪜 Ladder → 📺 C2-V4: Advanced Backpedal at Game Speed · 5 reps · 📺 V1–V5 at max speed · 5 reps each · Time your backpedal and break ⚡", tag: "All Drills Max" },
+    { id: 23, name: "Tue — 🔥 Stretch → 🪜 Ladder → 📺 C2-V1 + C2-V2 + C2-V3 + C2-V4 · 5 reps each · 📺 V1–V5 · 5 reps each · Hip flip both sides should feel equal now", tag: "Full Course 2" },
+    { id: 24, name: "Wed — 🔥 Stretch → 🪜 Ladder → FILM SESSION ⚡🎥 All Course 1 + Course 2 drills · 5 reps each · Every rep on camera · This is your recruiting tape", tag: "Recruit Tape" },
+    { id: 25, name: "Thu — 🔥 Stretch → 🪜 Ladder → 📺 C2-V1–C2-V4 + V1–V5 · All drills · 5 reps each · YouTube: 'double move routes DB' — watch 10 reps and write the tell", tag: "All Drills" },
+    { id: 26, name: "Fri — 🔥 Stretch → 🪜 Ladder → All Course 1 + Course 2 drills · 5 reps each · Add open field tackling form · 5 reps · Head up · Wrap and drive", tag: "All Drills" },
+    { id: 27, name: "Sat — 🔥 Stretch → 🪜 Ladder → FULL SHOWCASE 🏆⚡ All Course 1 + Course 2 drills · 5 reps each · Mental reset after every single rep · Film everything", tag: "Complete" },
     { id: 28, name: "Sun — REST. Watch Day 1 film next to today's film. That difference is 30 days of real work. Share it with Stefan. 🏆", tag: "Done" },
+  ],
+  "Beyond 30 Days — Stay in the Lab · 3 Days a Week · Forever": [
+    { id: 29, name: "Every Monday — 🔥 Stretch → 🪜 Ladder → Pick 3 drills from Course 1 · 5 reps each · Focus on your weakest drill", tag: "Foundation" },
+    { id: 30, name: "Every Wednesday — 🔥 Stretch → 🪜 Ladder → Full Course 2 run · C2-V1 through C2-V4 · 5 reps each · Add a live look with a partner when possible", tag: "Advanced" },
+    { id: 31, name: "Every Friday — 🔥 Stretch → 🪜 Ladder → All drills at game speed · Film one drill per session · Build your recruiting tape rep by rep 🎥", tag: "Tape Building" },
+    { id: 32, name: "Monthly — Film Review Day · Watch your oldest clip vs today · Send your best clip to Stefan · Tag @StefFromKC · Keep stacking reps until you get to college. 🏆", tag: "Film Review" },
   ],
 };
 
@@ -903,7 +909,7 @@ export default function App() {
                     {[
                       ["✅","Elite DB Foundation Kit", accessLevel >= 1 ? "Unlocked" : "Locked", accessLevel >= 1],
                       ["📚","Course 2 — Advanced Modules", accessLevel >= 1 ? "Unlocked" : "Locked", accessLevel >= 1],
-                      ["🏆","$67 Blueprint", accessLevel >= 3 ? "Unlocked" : "Locked", accessLevel >= 3]
+                      ["🏆","The Cornerback Blueprint", accessLevel >= 3 ? "Unlocked" : "Locked", accessLevel >= 3]
                     ].map(([icon,name,status,unlocked],i)=>(
                       <div key={i} style={{flex:1,background:unlocked?"rgba(245,197,24,.08)":"rgba(255,255,255,.03)",border:`1px solid ${unlocked?"rgba(245,197,24,.25)":BORDER}`,borderRadius:6,padding:"8px 6px",textAlign:"center"}}>
                         <div style={{fontSize:14,marginBottom:3}}>{unlocked ? "✅" : "🔒"}</div>
@@ -1018,7 +1024,7 @@ export default function App() {
             <div style={{margin:"0 16px 32px",borderRadius:10,overflow:"hidden",border:`1px solid ${accessLevel >= 3 ? "rgba(245,197,24,.35)" : "rgba(200,16,46,.2)"}`,background:accessLevel >= 3 ? "linear-gradient(135deg,#111,#141200)" : CARD}}>
               <div style={{background:accessLevel >= 3 ? "linear-gradient(135deg,#1a1400,#111)" : "linear-gradient(135deg,#110000,#111)",padding:"20px 18px 16px",borderBottom:`1px solid ${BORDER}`,position:"relative"}}>
                 <div style={{position:"absolute",top:14,right:14,background:accessLevel >= 3 ? G : "rgba(200,16,46,.12)",color:accessLevel >= 3 ? "#000" : RED,fontSize:9,fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:2,border:accessLevel >= 3 ? "none" : "1px solid rgba(200,16,46,.25)"}}>{accessLevel >= 3 ? "✓ UNLOCKED" : "🏆 UPGRADE"}</div>
-                <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 3 ? G : RED,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏆 Course 03 · $67 · The Blueprint</div>
+                <div style={{fontSize:10,fontWeight:700,color:accessLevel >= 3 ? G : RED,letterSpacing:".14em",textTransform:"uppercase",marginBottom:6}}>🏆 Course 03 · The Cornerback Blueprint</div>
                 <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:26,color:accessLevel >= 3 ? "#fff" : LG,lineHeight:1,marginBottom:6}}>THE CORNERBACK BLUEPRINT</div>
                 <div style={{fontSize:12,color:accessLevel >= 3 ? MID : GRAY,lineHeight:1.5}}>7 complete cornerback modules. Press coverage, zone coverages, off man, route recognition, film study, getting recruited, and Parent's Corner.</div>
                 <div style={{display:"flex",gap:12,marginTop:12,flexWrap:"wrap"}}>
