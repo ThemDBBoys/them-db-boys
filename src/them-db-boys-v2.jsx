@@ -998,7 +998,7 @@ export default function App() {
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:13,fontWeight:700,color:"#fff",lineHeight:1.3}}>30-Day Elite DB Game Plan PDF</div>
-                    <div style={{fontSize:11,color:MID,marginTop:2}}>Printable · Take it to the field</div>
+                    <div style={{fontSize:11,color:MID,marginTop:2}}>Printable · Take it to the field · Also in Checklist tab</div>
                   </div>
                   <div style={{fontSize:9,fontWeight:800,color:G,letterSpacing:".08em",textTransform:"uppercase"}}>DOWNLOAD</div>
                 </div>
@@ -1364,6 +1364,180 @@ export default function App() {
                 </div>
               </div>
             )}
+
+            {/* PDF DOWNLOADS */}
+            <div style={{margin:"0 16px 24px"}}>
+              <div style={{fontSize:10,fontWeight:900,color:G,letterSpacing:".14em",textTransform:"uppercase",marginBottom:12}}>📥 Your Game Plans</div>
+
+              {/* 30 DAY — access 1 and above */}
+              <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px",background:"rgba(245,197,24,.06)",border:`1px solid rgba(245,197,24,.2)`,borderRadius:8,marginBottom:10,cursor:"pointer"}}
+                onClick={()=>window.open("https://drive.google.com/file/d/1QHJWZsvODD8hMBlVzMCYajnsxTHoh3zI/view?usp=sharing","_blank")}>
+                <div style={{width:40,height:40,borderRadius:6,background:"rgba(245,197,24,.15)",border:`1px solid rgba(245,197,24,.3)`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <span style={{fontSize:20}}>📋</span>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:800,color:"#fff",lineHeight:1.3}}>30-Day Elite DB Game Plan</div>
+                  <div style={{fontSize:11,color:MID,marginTop:2}}>Foundation · Course 1 + Course 2 · Printable</div>
+                </div>
+                <div style={{fontSize:9,fontWeight:900,color:G,letterSpacing:".08em",textTransform:"uppercase",flexShrink:0}}>DOWNLOAD</div>
+              </div>
+
+              {/* 90 DAY — access 3 only */}
+              {accessLevel >= 3 ? (
+                <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px",background:"rgba(200,16,46,.06)",border:`1px solid rgba(200,16,46,.25)`,borderRadius:8,cursor:"pointer"}}
+                  onClick={()=>window.open("https://drive.google.com/file/d/1dbu14Dpr6_KQSq8mXIkkasp6f7bVuzDi/view?usp=sharing","_blank")}>
+                  <div style={{width:40,height:40,borderRadius:6,background:"rgba(200,16,46,.15)",border:`1px solid rgba(200,16,46,.3)`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    <span style={{fontSize:20}}>🏆</span>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:800,color:"#fff",lineHeight:1.3}}>90-Day Cornerback Blueprint Game Plan</div>
+                    <div style={{fontSize:11,color:MID,marginTop:2}}>Blueprint Level · All 3 Phases · D1 Recruiting System</div>
+                  </div>
+                  <div style={{fontSize:9,fontWeight:900,color:"#ff6b6b",letterSpacing:".08em",textTransform:"uppercase",flexShrink:0}}>DOWNLOAD</div>
+                </div>
+              ) : (
+                <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px",background:"rgba(255,255,255,.02)",border:`1px solid ${BORDER}`,borderRadius:8,opacity:.5}}>
+                  <div style={{width:40,height:40,borderRadius:6,background:"rgba(255,255,255,.05)",border:`1px solid ${BORDER}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    <span style={{fontSize:20}}>🔒</span>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:800,color:MID,lineHeight:1.3}}>90-Day Cornerback Blueprint Game Plan</div>
+                    <div style={{fontSize:11,color:GRAY,marginTop:2}}>Unlock with The Cornerback Blueprint</div>
+                  </div>
+                  <div style={{fontSize:9,fontWeight:900,color:GRAY,letterSpacing:".08em",textTransform:"uppercase",flexShrink:0}}>LOCKED</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── PARENT'S CORNER TAB ── */}
+        {tab === "parents" && accessLevel >= 3 && (
+          <div className="page">
+            <div style={{padding:"20px 16px 10px"}}>
+              <div className="sec-ttl" style={{fontSize:28}}>PARENT'S <em style={{color:G}}>CORNER</em></div>
+              <div style={{fontSize:12,color:MID,marginTop:4,lineHeight:1.6}}>Everything you need to protect your son's recruiting timeline — from eligibility to camps to how to support without overcoaching.</div>
+            </div>
+
+            {/* PDF DOWNLOAD */}
+            <div style={{margin:"0 16px 20px",display:"flex",alignItems:"center",gap:12,padding:"16px",background:"rgba(201,168,76,.06)",border:"1px solid rgba(201,168,76,.25)",borderRadius:8,cursor:"pointer"}}
+              onClick={()=>window.open("https://drive.google.com/file/d/1t4ZWOYN3PXlXmF-fGVaPU4epgQiYzgk4/view?usp=sharing","_blank")}>
+              <div style={{width:44,height:44,borderRadius:6,background:"rgba(201,168,76,.15)",border:"1px solid rgba(201,168,76,.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <span style={{fontSize:22}}>📖</span>
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:800,color:"#fff",lineHeight:1.3}}>Parent's Corner — Full Guide</div>
+                <div style={{fontSize:11,color:MID,marginTop:2}}>Recruiting timeline · NCAA eligibility · Camps · How to support · 8 sections</div>
+              </div>
+              <div style={{fontSize:9,fontWeight:900,color:"#C9A84C",letterSpacing:".08em",textTransform:"uppercase",flexShrink:0}}>DOWNLOAD</div>
+            </div>
+
+            {/* SECTION 1 — RECRUITING TIMELINE */}
+            <div style={{margin:"0 16px 16px",background:"linear-gradient(135deg,#0a0800,#0f0d00)",border:`1px solid rgba(201,168,76,.2)`,borderRadius:8,padding:"16px"}}>
+              <div style={{fontSize:10,fontWeight:900,color:"#C9A84C",letterSpacing:".14em",textTransform:"uppercase",marginBottom:12}}>📅 The Recruiting Timeline</div>
+              {[
+                {grade:"8th Grade",tag:"Foundation Year",items:["Start position-specific DB training now — backpedal mechanics and hip flip are trainable at this age","Run track if offered — develops hip flip and closing speed coaches watch for","Protect the GPA from day one","Play multiple sports to build athleticism and prevent burnout"]},
+                {grade:"9th Grade",tag:"Eligibility Starts",items:["Register at eligibilitycenter.org in September — coaches cannot recruit a player who is not registered","Every credit and grade counts from this point forward — aim for a 3.5 GPA","Take AP classes if available — they boost GPA and signal seriousness","Join a local 7-on-7 team in spring and summer","Start a $25-$50 monthly camp fund"]},
+                {grade:"10th Grade",tag:"Exposure Year",items:["Attend regional college camps — coaches are building their boards now","Build the first highlight tape and upload to Hudl","Start coach outreach — 15 to 20 realistic programs","Begin SAT/ACT prep — aim for 23+ on ACT · PrepMedians: prepmedians.com"]},
+                {grade:"11th Grade",tag:"Critical Year",items:["Most important recruiting year — junior season film gets the offers","Start official and unofficial campus visits","Handle SAT/ACT scores this fall","Update highlight tape after junior season","Send 5 coach emails per week consistently"]},
+                {grade:"12th Grade",tag:"Decision Year",items:["Early Signing Period is December — most opportunities committed by then","Do not let one failed senior class cost a scholarship","Compare offers carefully — a full D2 scholarship beats a partial D1 bench spot"]},
+              ].map((g,i)=>(
+                <div key={i} style={{padding:"10px 0",borderBottom:i<4?`1px solid rgba(255,255,255,.05)`:"none"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                    <div style={{fontSize:13,fontWeight:800,color:"#C9A84C"}}>{g.grade}</div>
+                    <div style={{fontSize:8,fontWeight:800,color:"#C9A84C",background:"rgba(201,168,76,.1)",border:"1px solid rgba(201,168,76,.2)",padding:"1px 7px",borderRadius:2,letterSpacing:".1em",textTransform:"uppercase"}}>{g.tag}</div>
+                  </div>
+                  {g.items.map((item,j)=>(
+                    <div key={j} style={{display:"flex",gap:7,fontSize:11,color:MID,lineHeight:1.5,marginBottom:3}}>
+                      <span style={{color:"#C9A84C",flexShrink:0,fontSize:8,marginTop:4}}>◆</span>{item}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* SECTION 2 — NCAA ELIGIBILITY */}
+            <div style={{margin:"0 16px 16px",background:CARD,border:`1px solid ${BORDER}`,borderRadius:8,padding:"16px"}}>
+              <div style={{fontSize:10,fontWeight:900,color:"#C9A84C",letterSpacing:".14em",textTransform:"uppercase",marginBottom:12}}>🎓 NCAA Eligibility — Key Rules</div>
+              {[
+                ["Eligibility starts in 9th grade","Not when your son graduates — every credit and grade from freshman year goes on the record"],
+                ["16 core courses required for D1","English, math, science, social studies, foreign language — ask the counselor for the full list"],
+                ["Minimum 2.3 GPA — aim for 3.5","The higher the GPA the more scholarship money and options. 3.5 makes your son competitive against other recruits"],
+                ["One failed class can cost an offer","The most common way families lose scholarship opportunities. Monitor every grade every semester"],
+                ["Register at eligibilitycenter.org","Do this in September of 9th grade — coaches cannot officially recruit an unregistered player"],
+                ["D2 requires 2.2 GPA in 16 core courses","D2 is a real path to a professional career. Do not overlook it — a full D2 scholarship beats a partial D1 bench spot"],
+              ].map(([title,desc],i)=>(
+                <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom:i<5?`1px solid rgba(255,255,255,.05)`:"none"}}>
+                  <span style={{color:"#C9A84C",flexShrink:0,fontSize:12,marginTop:2}}>✦</span>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:800,color:"#fff",marginBottom:2}}>{title}</div>
+                    <div style={{fontSize:11,color:MID,lineHeight:1.5}}>{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* SECTION 3 — SAT/ACT */}
+            <div style={{margin:"0 16px 16px",background:"linear-gradient(135deg,#0a0800,#0f0d00)",border:`1px solid rgba(201,168,76,.2)`,borderRadius:8,padding:"16px"}}>
+              <div style={{fontSize:10,fontWeight:900,color:"#C9A84C",letterSpacing:".14em",textTransform:"uppercase",marginBottom:10}}>📝 SAT/ACT Prep</div>
+              <div style={{fontSize:12,color:MID,lineHeight:1.6,marginBottom:10}}>Start in 10th grade. Aim for 23+ on the ACT for D1. Stefan's sister raised her score by 6 points using PrepMedians — treat it like a position drill, reps every day.</div>
+              <button style={{width:"100%",background:"#C9A84C",color:"#000",border:"none",borderRadius:3,padding:"10px",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",cursor:"pointer"}}
+                onClick={()=>window.open("https://www.prepmedians.com","_blank")}>
+                Visit PrepMedians →
+              </button>
+            </div>
+
+            {/* SECTION 4 — DO AND DON'T */}
+            <div style={{margin:"0 16px 16px",background:CARD,border:`1px solid ${BORDER}`,borderRadius:8,padding:"16px"}}>
+              <div style={{fontSize:10,fontWeight:900,color:"#C9A84C",letterSpacing:".14em",textTransform:"uppercase",marginBottom:12}}>💪 Support Without Overcoaching</div>
+              <div style={{marginBottom:10}}>
+                <div style={{fontSize:9,fontWeight:800,color:"#66dd66",letterSpacing:".14em",textTransform:"uppercase",marginBottom:6,paddingBottom:6,borderBottom:"1px solid rgba(100,220,100,.15)"}}>✓ What To Do</div>
+                {["Show up consistently — your presence matters more than your coaching","Handle logistics — camps, eligibility, emails — this is your lane","Celebrate effort and consistency not just big plays","Research programs together — let him have a voice"].map((item,i)=>(
+                  <div key={i} style={{display:"flex",gap:8,fontSize:11,color:MID,lineHeight:1.5,marginBottom:4}}>
+                    <span style={{color:"#66dd66",flexShrink:0}}>✓</span>{item}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{fontSize:9,fontWeight:800,color:"#ff7777",letterSpacing:".14em",textTransform:"uppercase",marginBottom:6,paddingBottom:6,borderBottom:"1px solid rgba(255,100,100,.15)"}}>✗ What Not To Do</div>
+                {["Do not coach from the sideline — coaches notice and it reflects on the athlete","Do not contact coaches on his behalf — he must build those relationships himself","Do not compare him to other recruits — his path is his own","Do not bring up mistakes right after a game — give it 24 hours"].map((item,i)=>(
+                  <div key={i} style={{display:"flex",gap:8,fontSize:11,color:MID,lineHeight:1.5,marginBottom:4}}>
+                    <span style={{color:"#ff7777",flexShrink:0}}>✗</span>{item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* SECTION 5 — CAMPS */}
+            <div style={{margin:"0 16px 24px",background:"linear-gradient(135deg,#0a0800,#0f0d00)",border:`1px solid rgba(201,168,76,.2)`,borderRadius:8,padding:"16px"}}>
+              <div style={{fontSize:10,fontWeight:900,color:"#C9A84C",letterSpacing:".14em",textTransform:"uppercase",marginBottom:12}}>🏕️ Finding Camps & Exposure Events</div>
+              <div style={{fontSize:10,fontWeight:800,color:"#C9A84C",letterSpacing:".1em",textTransform:"uppercase",marginBottom:8}}>Find Local Camps:</div>
+              {[
+                ["footballcampsusa.com","Search by state or zip — best for finding local D1 D2 and NAIA camps near you"],
+                ["ncsasports.org/football/camps","NCSA camp finder plus free recruiting profile so coaches can find your son"],
+                ["ryzer.com","Search upcoming college prospect camps by zip code"],
+              ].map(([url,desc],i)=>(
+                <div key={i} style={{padding:"6px 0",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
+                  <div style={{fontSize:11,fontWeight:800,color:"#C9A84C",cursor:"pointer"}} onClick={()=>window.open(`https://www.${url}`,"_blank")}>{url} →</div>
+                  <div style={{fontSize:11,color:MID,lineHeight:1.4}}>{desc}</div>
+                </div>
+              ))}
+              <div style={{fontSize:10,fontWeight:800,color:"#C9A84C",letterSpacing:".1em",textTransform:"uppercase",margin:"12px 0 8px"}}>Regional & National Exposure:</div>
+              {[
+                ["underarmournext.com","UA Next Camp Series — runs Feb through April nationally — top performers earn All-America Game"],
+                ["vtosports.net","VTO Sports Elite 100 — hosted at college stadiums — athletes can receive offers onsite"],
+                ["exactsports.com","EXACT Sports — 1000+ NCAA coaches in network — professional video at every event"],
+              ].map(([url,desc],i)=>(
+                <div key={i} style={{padding:"6px 0",borderBottom:i<2?`1px solid rgba(255,255,255,.05)`:"none"}}>
+                  <div style={{fontSize:11,fontWeight:800,color:"#C9A84C",cursor:"pointer"}} onClick={()=>window.open(`https://www.${url}`,"_blank")}>{url} →</div>
+                  <div style={{fontSize:11,color:MID,lineHeight:1.4}}>{desc}</div>
+                </div>
+              ))}
+              <div style={{marginTop:12,padding:"10px 12px",background:"rgba(201,168,76,.08)",borderRadius:4,fontSize:11,color:MID,lineHeight:1.6}}>
+                💡 <strong style={{color:"#fff"}}>Pro tip:</strong> Before any camp email the coach and let them know your son will be there. This gets his name on a watch list before he walks in the door.
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -1374,6 +1548,7 @@ export default function App() {
             { id: "videos", icon: "📚", label: "Courses", badge: "3" },
             { id: "book", icon: "📅", label: "Book" },
             { id: "drills", icon: "✅", label: "Checklist" },
+            ...(accessLevel >= 3 ? [{ id: "parents", icon: "👨‍👩‍👦", label: "Parents" }] : []),
           ].map(n => (
             <div key={n.id} className={`ni${tab === n.id ? " act" : ""}`} onClick={() => { setTab(n.id); setOpenCourse(null); }}>
               {n.badge && <div className="nbadge">{n.badge}</div>}
