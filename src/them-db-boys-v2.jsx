@@ -515,20 +515,15 @@ export default function App() {
     // Check URL for logout parameter
     if (params.get('logout') === 'true') {
       const clearAndRedirect = async () => {
-        try { await supabase.auth.signOut({ scope: 'global' }); } catch(e) {}
-        // Clear all possible storage
+        // Clear all storage first
         sessionStorage.clear();
-        localStorage.clear();
-        // Clear all Supabase specific keys
         Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('sb-') || key.includes('supabase')) {
-            localStorage.removeItem(key);
-          }
+          localStorage.removeItem(key);
         });
-        // Small delay to let Supabase finish clearing
+        try { await supabase.auth.signOut({ scope: 'global' }); } catch(e) {}
         setTimeout(() => {
           window.location.href = 'https://them-db-boys.vercel.app';
-        }, 500);
+        }, 800);
       };
       clearAndRedirect();
       return;
@@ -598,17 +593,16 @@ export default function App() {
   }
 
   async function handleLogout() {
-    try { await supabase.auth.signOut({ scope: 'global' }); } catch(e) {}
+    // Clear everything first before signOut
     sessionStorage.clear();
-    localStorage.clear();
     Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('sb-') || key.includes('supabase')) {
-        localStorage.removeItem(key);
-      }
+      localStorage.removeItem(key);
     });
+    try { await supabase.auth.signOut({ scope: 'global' }); } catch(e) {}
+    // Force reload after longer delay to ensure Supabase fully clears
     setTimeout(() => {
       window.location.href = 'https://them-db-boys.vercel.app?logout=true';
-    }, 300);
+    }, 800);
   }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
