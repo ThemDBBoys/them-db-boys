@@ -514,11 +514,23 @@ export default function App() {
 
     // Check URL for logout parameter
     if (params.get('logout') === 'true') {
-      supabase.auth.signOut().then(() => {
+      const clearAndRedirect = async () => {
+        try { await supabase.auth.signOut({ scope: 'global' }); } catch(e) {}
+        // Clear all possible storage
         sessionStorage.clear();
         localStorage.clear();
-        window.location.replace(window.location.pathname);
-      });
+        // Clear all Supabase specific keys
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+        // Small delay to let Supabase finish clearing
+        setTimeout(() => {
+          window.location.href = 'https://them-db-boys.vercel.app';
+        }, 500);
+      };
+      clearAndRedirect();
       return;
     }
 
@@ -586,10 +598,17 @@ export default function App() {
   }
 
   async function handleLogout() {
-    try { await supabase.auth.signOut(); } catch(e) {}
+    try { await supabase.auth.signOut({ scope: 'global' }); } catch(e) {}
     sessionStorage.clear();
     localStorage.clear();
-    window.location.replace('https://them-db-boys.vercel.app?logout=true');
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-') || key.includes('supabase')) {
+        localStorage.removeItem(key);
+      }
+    });
+    setTimeout(() => {
+      window.location.href = 'https://them-db-boys.vercel.app?logout=true';
+    }, 300);
   }
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2800); }
