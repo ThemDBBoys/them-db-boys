@@ -973,12 +973,12 @@ export default function App() {
                   </div>
                 ))}
                 <div style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",cursor:"pointer"}}
-                  onClick={()=>window.open("https://drive.google.com/file/d/1Pt4R6sCRYrD3iMfLnKXGA8qmAOson4-b/view?usp=sharing", "_blank")}>
+                  onClick={()=>window.open("https://drive.google.com/file/d/1QHJWZsvODD8hMBlVzMCYajnsxTHoh3zI/view?usp=sharing", "_blank")}>
                   <div style={{width:32,height:32,borderRadius:6,background:"rgba(245,197,24,.12)",border:`1px solid rgba(245,197,24,.25)`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                     <span style={{fontSize:16}}>📋</span>
                   </div>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:13,fontWeight:700,color:"#fff",lineHeight:1.3}}>30-Day Cornerback Checklist PDF</div>
+                    <div style={{fontSize:13,fontWeight:700,color:"#fff",lineHeight:1.3}}>30-Day Elite DB Game Plan PDF</div>
                     <div style={{fontSize:11,color:MID,marginTop:2}}>Printable · Take it to the field</div>
                   </div>
                   <div style={{fontSize:9,fontWeight:800,color:G,letterSpacing:".08em",textTransform:"uppercase"}}>DOWNLOAD</div>
